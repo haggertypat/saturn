@@ -12,7 +12,7 @@ export default async function NewEntry() {
     }
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen">
             <Header user={user} />
             <main className="max-w-4xl mx-auto px-4 py-8">
                 <EntryForm />

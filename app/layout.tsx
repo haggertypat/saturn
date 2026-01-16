@@ -1,8 +1,18 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
+import { Source_Serif_4, Inter } from 'next/font/google'
+import { ThemeInit } from '@/components/ThemeInit'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+    subsets: ['latin'],
+    variable: '--font-sans'
+})
+
+const sourceSerif = Source_Serif_4({
+    subsets: ['latin'],
+    style: ['normal', 'italic'],
+    variable: '--font-source-serif', // This creates the CSS variable
+})
 
 export const metadata: Metadata = {
     title: 'Journal',
@@ -15,8 +25,11 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <html lang="en">
-        <body className={inter.className}>{children}</body>
+        <html lang="en" className={`${sourceSerif.variable} font-serif`}>
+        <body className="antialiased">
+            <ThemeInit />
+            {children}
+        </body>
         </html>
     )
 }

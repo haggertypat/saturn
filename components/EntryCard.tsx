@@ -8,10 +8,10 @@ export default function EntryCard({ entry }: { entry: Entry }) {
 
     return (
         <Link href={`/entries/${entry.id}`}>
-            <article className="border border-gray-200 p-6 hover:border-gray-400 transition-colors cursor-pointer">
+            <article className="border border-gray-200 p-6 mb-1.5 hover:border-gray-400 transition-colors cursor-pointer">
                 <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-medium text-gray-900">{entry.title}</h3>
-                    <time className="text-sm text-gray-500">
+                    <h3 className="text-lg font-medium ">{entry.title}</h3>
+                    <time className="text-sm">
                         {eventDate.toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'short',
@@ -20,7 +20,7 @@ export default function EntryCard({ entry }: { entry: Entry }) {
                     </time>
                 </div>
 
-                <div className="prose prose-sm max-w-none text-gray-600 line-clamp-3">
+                <div className="prose prose-sm max-w-none">
                     <ReactMarkdown>{preview}</ReactMarkdown>
                 </div>
 
@@ -29,7 +29,7 @@ export default function EntryCard({ entry }: { entry: Entry }) {
                         {entry.tags.map((tag) => (
                             <span
                                 key={tag}
-                                className="text-xs px-2 py-1 bg-gray-100 text-gray-700"
+                                className="text-xs px-2 py-1"
                             >
                 {tag}
               </span>

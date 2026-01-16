@@ -27,9 +27,9 @@ export default async function ViewEntry({
     }
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen">
             <Header user={user} />
-            <main className="max-w-4xl mx-auto px-4 py-8">
+            <main className="mx-auto max-w-2xl px-6 py-16">
                 <EntryView entry={entry} />
             </main>
         </div>

@@ -36,13 +36,13 @@ export default function EntryView({ entry }: { entry: Entry }) {
     }
 
     return (
-        <article className="space-y-6">
+        <article className="prose prose-layout dark:prose-invert">
             <div className="flex justify-between items-start">
                 <div>
-                    <h1 className="text-3xl font-light text-gray-900 mb-2">
+                    <h1 className="text-3xl mb-2">
                         {entry.title}
                     </h1>
-                    <time className="text-sm text-gray-500">
+                    <time className="text-sm">
                         {eventDate.toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'long',
@@ -91,9 +91,9 @@ export default function EntryView({ entry }: { entry: Entry }) {
             <div className="pt-6 border-t border-gray-200">
                 <Link
                     href="/"
-                    className="text-sm text-gray-600 hover:text-gray-900"
+                    className="text-sm"
                 >
-                    ← Back to all entries
+                    ← Back
                 </Link>
             </div>
         </article>

@@ -1,26 +1,51 @@
 @import "tailwindcss";
 
+@theme {
+    --font-sans: var(--font-sans);
+    --font-serif: var(--font-serif);
+
+    /* Define theme colors that point to CSS variables */
+    --color-background: var(--bg);
+    --color-foreground: var(--fg);
+    --color-border: var(--brd);
+}
+
+/* 1. Define the default (Light) variables */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+    --bg: #fdfdfc;
+    --fg: #1a1a1a;
+    --brd: #e5e5e4;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* 2. Define the Dark variables - Use both selectors to be safe */
+:root.dark,
+.dark {
+    --bg: #0a0a0a;
+    --fg: #ededed;
+    --brd: #262626;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+@layer base {
+    /* 3. Force apply to the root elements */
+    html, body {
+        background-color: var(--bg) !important;
+        color: var(--fg) !important;
+        @apply antialiased transition-colors duration-300;
+    }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+    /* Fix for Markdown specifically */
+    .prose-layout {
+        font-family: var(--font-serif);
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        max-width: 65ch;
+        margin: 0 auto;
+        padding: 4rem 1rem;
+    }
+
+    .prose-layout h1, .prose-layout h2, .prose-layout h3 {
+        color: var(--fg);
+        @apply font-serif font-bold tracking-tight;
+    }
 }
