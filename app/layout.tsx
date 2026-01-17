@@ -15,8 +15,8 @@ const sourceSerif = Source_Serif_4({
 })
 
 export const metadata: Metadata = {
-    title: 'Journal',
-    description: 'A minimal journal app',
+    title: 'Saturn',
+    description: 'A dream journal',
 }
 
 export default function RootLayout({
