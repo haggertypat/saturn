@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Override dark mode to use class strategy */
+@variant dark (&:is(.dark *));
 
 @theme {
     --font-sans: var(--font-sans);
@@ -31,21 +35,5 @@
         background-color: var(--bg) !important;
         color: var(--fg) !important;
         @apply antialiased transition-colors duration-300;
-    }
-
-    /* Fix for Markdown specifically */
-    .prose-layout {
-        font-family: var(--font-serif);
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-        max-width: 65ch;
-        margin: 0 auto;
-        padding: 4rem 1rem;
-    }
-
-    .prose-layout h1, .prose-layout h2, .prose-layout h3 {
-        color: var(--fg);
-        @apply font-serif font-bold tracking-tight;
     }
 }

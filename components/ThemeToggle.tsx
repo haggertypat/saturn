@@ -9,7 +9,7 @@ export function ThemeToggle() {
     }
 
     return (
-        <button onClick={toggle}>
+        <button className="text-sm mr-2 cursor-pointer" onClick={toggle}>
             Dark mode
         </button>
     )

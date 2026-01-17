@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import type { Entry } from '@/lib/types'
 import { createClient } from '@/lib/supabase/client'
+import {buttonStyles} from "@/lib/styles";
 
 export default function EntryView({ entry }: { entry: Entry }) {
     const router = useRouter()
@@ -36,7 +37,8 @@ export default function EntryView({ entry }: { entry: Entry }) {
     }
 
     return (
-        <article className="prose prose-layout dark:prose-invert">
+
+        <article className="">
             <div className="flex justify-between items-start">
                 <div>
                     <h1 className="text-3xl mb-2">
@@ -55,14 +57,14 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 <div className="flex gap-2">
                     <Link
                         href={`/entries/${entry.id}/edit`}
-                        className="px-4 py-2 border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
+                        className={buttonStyles.secondary}
                     >
                         Edit
                     </Link>
                     <button
                         onClick={handleDelete}
                         disabled={deleting}
-                        className="px-4 py-2 border border-red-300 text-sm text-red-700 hover:bg-red-50 disabled:opacity-50"
+                        className={buttonStyles.secondary}
                     >
                         {deleting ? 'Deleting...' : 'Delete'}
                     </button>
@@ -82,7 +84,8 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 </div>
             )}
 
-            <div className="prose prose-lg max-w-none">
+            <div className="prose dark:prose-invert max-w-none">
+
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {entry.body}
                 </ReactMarkdown>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Entry } from '@/lib/types'
 import TagInput from './TagInput'
+import {Button} from "@/components/Button";
 
 export default function EntryForm({ entry }: { entry?: Entry }) {
     const router = useRouter()
@@ -119,20 +120,20 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
             )}
 
             <div className="flex gap-4">
-                <button
+                <Button
                     type="submit"
                     disabled={loading}
-                    className="px-6 py-2 bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-50"
                 >
-                    {loading ? 'Saving...' : entry ? 'Update Entry' : 'Create Entry'}
-                </button>
-                <button
+                    {loading ? 'Saving...' : entry ? 'Update' : 'Create'}
+                </Button>
+                <Button
                     type="button"
+                    variant="secondary"
                     onClick={() => router.back()}
-                    className="px-6 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50"
+                    className=""
                 >
                     Cancel
-                </button>
+                </Button>
             </div>
         </form>
     )

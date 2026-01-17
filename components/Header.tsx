@@ -23,14 +23,16 @@ export default function Header({ user }: { user: User }) {
                     <Link
                         href="/">Saturn</Link>
                 </h1>
-                <ThemeToggle />
+                <div className="flex items-right">
+                    <ThemeToggle />
 
-                <button
-                    onClick={handleLogout}
-                    className="text-sm"
-                >
-                    Sign Out
-                </button>
+                    <button
+                        onClick={handleLogout}
+                        className="text-sm cursor-pointer"
+                    >
+                        Sign Out
+                    </button>
+                </div>
             </div>
         </header>
     )
