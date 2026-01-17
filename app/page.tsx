@@ -15,7 +15,7 @@ export default async function Home() {
     const { data: entries } = await supabase
         .from('entries')
         .select('*')
-        .order('event_datetime', { ascending: false })
+        .order('event_date', { ascending: false })
 
     return (
         <div className="min-h-screen">

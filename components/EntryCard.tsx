@@ -3,7 +3,7 @@ import type { Entry } from '@/lib/types'
 import ReactMarkdown from 'react-markdown'
 
 export default function EntryCard({ entry }: { entry: Entry }) {
-    const eventDate = new Date(entry.event_datetime)
+    const eventDate = new Date(entry.event_date)
     const preview = entry.body.slice(0, 200) + (entry.body.length > 200 ? '...' : '')
 
     return (
@@ -20,7 +20,7 @@ export default function EntryCard({ entry }: { entry: Entry }) {
                     </time>
                 </div>
 
-                <div className="prose prose-sm max-w-none">
+                <div className="prose prose-sm dark:prose-invert max-w-none">
                     <ReactMarkdown>{preview}</ReactMarkdown>
                 </div>
 

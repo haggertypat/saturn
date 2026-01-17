@@ -30,7 +30,7 @@ export default async function EditEntry({
         <div className="min-h-screen">
             <Header user={user} />
             <main className="max-w-4xl mx-auto px-4 py-8">
-                <h2 className="text-2xl font-light text-gray-900 mb-6">Edit</h2>
+                <h2 className="text-2xl mb-6">Edit</h2>
                 <EntryForm entry={entry} />
             </main>
         </div>

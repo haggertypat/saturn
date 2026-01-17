@@ -24,6 +24,13 @@ export default function Header({ user }: { user: User }) {
                         href="/">Saturn</Link>
                 </h1>
                 <div className="flex items-right">
+                    <Link
+                        href="/entries/new"
+                        className="text-sm mr-2"
+                    >
+                        New
+                    </Link>
+
                     <ThemeToggle />
 
                     <button

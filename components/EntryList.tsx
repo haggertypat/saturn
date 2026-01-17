@@ -14,14 +14,6 @@ export default function EntryList({ initialEntries }: { initialEntries: Entry[] 
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-end items-end">
-                <Link
-                    href="/entries/new"
-                    className="px-4 py-2"
-                >
-                    New
-                </Link>
-            </div>
 
             {entries.length === 0 ? (
                 <div className="text-center py-12">

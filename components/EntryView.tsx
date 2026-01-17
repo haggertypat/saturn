@@ -14,7 +14,7 @@ export default function EntryView({ entry }: { entry: Entry }) {
     const supabase = createClient()
     const [deleting, setDeleting] = useState(false)
 
-    const eventDate = new Date(entry.event_datetime)
+    const eventDate = new Date(entry.event_date)
 
     const handleDelete = async () => {
         if (!confirm('Are you sure you want to delete this entry?')) {
@@ -39,18 +39,16 @@ export default function EntryView({ entry }: { entry: Entry }) {
     return (
 
         <article className="">
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-start mb-2">
                 <div>
-                    <h1 className="text-3xl mb-2">
+                    <h1 className="text-3xl">
                         {entry.title}
                     </h1>
                     <time className="text-sm">
                         {eventDate.toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
+                            day: 'numeric'
                         })}
                     </time>
                 </div>
@@ -72,7 +70,7 @@ export default function EntryView({ entry }: { entry: Entry }) {
             </div>
 
             {entry.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mb-2">
                     {entry.tags.map((tag) => (
                         <span
                             key={tag}
@@ -84,14 +82,14 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 </div>
             )}
 
-            <div className="prose dark:prose-invert max-w-none">
+            <div className="prose dark:prose-invert max-w-none mt-6">
 
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {entry.body}
                 </ReactMarkdown>
             </div>
 
-            <div className="pt-6 border-t border-gray-200">
+            <div className="pt-6 mt-6 border-t border-gray-200">
                 <Link
                     href="/"
                     className="text-sm"

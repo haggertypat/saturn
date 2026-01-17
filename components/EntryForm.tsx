@@ -15,10 +15,9 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
 
     const [title, setTitle] = useState(entry?.title || '')
     const [body, setBody] = useState(entry?.body || '')
-    const [eventDatetime, setEventDatetime] = useState(
-        entry?.event_datetime
-            ? new Date(entry.event_datetime).toISOString().slice(0, 16)
-            : new Date().toISOString().slice(0, 16)
+    const [eventDate, setEventDate] = useState(
+            entry? entry.event_date
+            : new Date().toISOString().slice(0, 10)
     )
     const [tags, setTags] = useState<string[]>(entry?.tags || [])
 
@@ -30,7 +29,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
         const entryData = {
             title,
             body,
-            event_datetime: new Date(eventDatetime).toISOString(),
+            event_date: new Date(eventDate).toISOString(),
             tags,
         }
 
@@ -48,15 +47,17 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                 router.refresh()
             }
         } else {
-            const { error } = await supabase
+            const { data, error } = await supabase
                 .from('entries')
                 .insert([entryData])
+                .select()
+                .single()
 
             if (error) {
                 setError(error.message)
                 setLoading(false)
             } else {
-                router.push('/')
+                router.push(`/entries/${data.id}`)
                 router.refresh()
             }
         }
@@ -65,7 +66,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="title" className="block text-sm font-medium mb-2">
                     Title
                 </label>
                 <input
@@ -81,21 +82,21 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
             </div>
 
             <div>
-                <label htmlFor="event_datetime" className="block text-sm font-medium text-gray-700 mb-2">
-                    Date & Time
+                <label htmlFor="event_date" className="block text-sm font-medium mb-2">
+                    Date
                 </label>
                 <input
-                    id="event_datetime"
-                    type="datetime-local"
+                    id="event_date"
+                    type="date"
                     required
-                    value={eventDatetime}
-                    onChange={(e) => setEventDatetime(e.target.value)}
+                    value={eventDate}
+                    onChange={(e) => setEventDate(e.target.value)}
                     className="px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                 />
             </div>
 
             <div>
-                <label htmlFor="body" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="body" className="block text-sm font-medium mb-2">
                     Entry
                 </label>
                 <textarea
@@ -109,7 +110,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
             </div>
 
             <div>
-                <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="tags" className="block text-sm font-medium mb-2">
                     Tags
                 </label>
                 <TagInput tags={tags} onChange={setTags} />
