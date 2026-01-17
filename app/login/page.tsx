@@ -55,7 +55,7 @@ export default function Login() {
             <div className="max-w-md w-full space-y-8 p-8">
                 <div>
                     <h2 className="text-3xl font-light text-center text-gray-900">
-                        Journal
+                        Saturn
                     </h2>
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={handleLogin}>
