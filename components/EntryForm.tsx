@@ -143,9 +143,10 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                 />
             </div>
 
-            <div>
-                <TagInput tags={tags} onChange={setTags} />
-            </div>
+
+            {/*<div>*/}
+            {/*    <TagInput tags={tags} onChange={setTags} />*/}
+            {/*</div>*/}
 
             {error && (
                 <div className="text-red-600 text-sm">{error}</div>

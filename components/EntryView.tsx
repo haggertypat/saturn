@@ -69,18 +69,18 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 </div>
             </div>
 
-            {entry.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-2">
-                    {entry.tags.map((tag) => (
-                        <span
-                            key={tag}
-                            className="text-xs px-2 py-1 bg-gray-100 text-gray-700"
-                        >
-              {tag}
-            </span>
-                    ))}
-                </div>
-            )}
+            {/*{entry.tags.length > 0 && (*/}
+            {/*    <div className="flex flex-wrap gap-2 mb-2">*/}
+            {/*        {entry.tags.map((tag) => (*/}
+            {/*            <span*/}
+            {/*                key={tag}*/}
+            {/*                className="text-xs px-2 py-1 bg-gray-100 text-gray-700"*/}
+            {/*            >*/}
+            {/*  {tag}*/}
+            {/*</span>*/}
+            {/*        ))}*/}
+            {/*    </div>*/}
+            {/*)}*/}
 
             <div className="prose dark:prose-invert max-w-none mt-6">
 

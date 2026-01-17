@@ -24,18 +24,18 @@ export default function EntryCard({ entry }: { entry: Entry }) {
                     <ReactMarkdown>{preview}</ReactMarkdown>
                 </div>
 
-                {entry.tags.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                        {entry.tags.map((tag) => (
-                            <span
-                                key={tag}
-                                className="text-xs px-2 py-1"
-                            >
-                {tag}
-              </span>
-                        ))}
-                    </div>
-                )}
+              {/*  {entry.tags.length > 0 && (*/}
+              {/*      <div className="mt-3 flex flex-wrap gap-2">*/}
+              {/*          {entry.tags.map((tag) => (*/}
+              {/*              <span*/}
+              {/*                  key={tag}*/}
+              {/*                  className="text-xs px-2 py-1"*/}
+              {/*              >*/}
+              {/*  {tag}*/}
+              {/*</span>*/}
+              {/*          ))}*/}
+              {/*      </div>*/}
+              {/*  )}*/}
             </article>
         </Link>
     )
