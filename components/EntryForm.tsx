@@ -65,26 +65,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-                <label htmlFor="title" className="block text-sm font-medium mb-2">
-                    Title
-                </label>
-                <input
-                    id="title"
-                    type="text"
-                    required
-                    maxLength={250}
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-lg"
-                    placeholder="Entry title"
-                />
-            </div>
-
-            <div>
-                <label htmlFor="event_date" className="block text-sm font-medium mb-2">
-                    Date
-                </label>
+            <div className="float-right">
                 <input
                     id="event_date"
                     type="date"
@@ -96,23 +77,27 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
             </div>
 
             <div>
-                <label htmlFor="body" className="block text-sm font-medium mb-2">
-                    Entry
-                </label>
+                <input
+                    id="title"
+                    type="text"
+                    required
+                    maxLength={250}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-lg"
+                />
+            </div>
+            <div>
                 <textarea
                     id="body"
                     required
                     value={body}
                     onChange={(e) => setBody(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-base leading-relaxed min-h-[400px] resize-y"
-                    placeholder="Write your entry here... (Markdown supported)"
                 />
             </div>
 
             <div>
-                <label htmlFor="tags" className="block text-sm font-medium mb-2">
-                    Tags
-                </label>
                 <TagInput tags={tags} onChange={setTags} />
             </div>
 
