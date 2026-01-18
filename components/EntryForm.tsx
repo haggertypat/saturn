@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Entry } from '@/lib/types'
 import TagInput from './TagInput'
 import { Button } from "@/components/Button"
+import ZenEditor from './ZenEditor'  // Add this import
 
 export default function EntryForm({ entry }: { entry?: Entry }) {
     const router = useRouter()
@@ -13,6 +14,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [lastSaved, setLastSaved] = useState<Date | null>(null)
+    const [isZenMode, setIsZenMode] = useState(false)  // Add this state
 
     const storageKey = entry ? `entry-draft-${entry.id}` : 'entry-draft-new'
 
@@ -100,6 +102,16 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
 
     const hasDraft = title || body || tags.length > 0
 
+    if (isZenMode) {
+        return (
+            <ZenEditor
+                value={body}
+                onChange={setBody}
+                onExit={() => setIsZenMode(false)}
+            />
+        )
+    }
+
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             {hasDraft && lastSaved && (
@@ -107,6 +119,16 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                     Auto-saved {lastSaved.toLocaleTimeString()}
                 </div>
             )}
+
+            <div className="flex justify-between items-center mb-2">
+                <button
+                    type="button"
+                    onClick={() => setIsZenMode(true)}
+                    className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                >
+                    Zen mode
+                </button>
+            </div>
 
             <div className="float-right">
                 <input

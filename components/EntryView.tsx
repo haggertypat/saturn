@@ -14,7 +14,8 @@ export default function EntryView({ entry }: { entry: Entry }) {
     const supabase = createClient()
     const [deleting, setDeleting] = useState(false)
 
-    const eventDate = new Date(entry.event_date)
+    const [year, month, day] = entry.event_date.split('-')
+    const eventDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
 
     const handleDelete = async () => {
         if (!confirm('Are you sure you want to delete this entry?')) {

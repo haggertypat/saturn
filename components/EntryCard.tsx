@@ -3,7 +3,8 @@ import type { Entry } from '@/lib/types'
 import ReactMarkdown from 'react-markdown'
 
 export default function EntryCard({ entry }: { entry: Entry }) {
-    const eventDate = new Date(entry.event_date)
+    const [year, month, day] = entry.event_date.split('-')
+    const eventDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
     const preview = entry.body.slice(0, 200) + (entry.body.length > 200 ? '...' : '')
 
     return (
