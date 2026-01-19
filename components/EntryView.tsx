@@ -92,14 +92,7 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 </ReactMarkdown>
             </div>
 
-            <div className="pt-6 mt-6 border-t border-gray-200">
-                <Link
-                    href="/"
-                    className="text-sm"
-                >
-                    ← Back
-                </Link>
-            </div>
+            
         </article>
     )
 }
