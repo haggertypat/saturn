@@ -21,6 +21,7 @@ export default function ZenEditor({
         if (!el) return;
         el.style.height = "auto";
         el.style.height = `${el.scrollHeight}px`;
+        textareaRef.current?.focus();
     }, [value]);
 
     // ESC to exit zen mode
