@@ -114,12 +114,6 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
-            {hasDraft && lastSaved && (
-                <div className="text-sm text-gray-500 float-right">
-                    Auto-saved {lastSaved.toLocaleTimeString()}
-                </div>
-            )}
-
 
             <div className="mb-6">
                 <input
@@ -153,15 +147,12 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                 />
                 </div>
 
-                <div>
-                <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setIsZenMode(true)}
-                    className=""
-                >
-                    Zen mode
-                </Button>
+                <div className="flex items-center">
+                    {hasDraft && lastSaved && (
+                        <div className="text-sm mr-2 text-gray-400 dark:text-gray-500">
+                            Auto-saved {lastSaved.toLocaleTimeString()}
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -185,8 +176,16 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                 <div className="text-red-600 text-sm">{error}</div>
             )}
 
-            <div className="flex gap-4 items-center">
-                <Button type="submit" disabled={loading}>
+            <div className="flex gap-4 justify-end">
+                <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setIsZenMode(true)}
+                    className=""
+                >
+                    Zen mode
+                </Button>
+                <Button type="submit" variant="secondary" disabled={loading}>
                     {loading ? 'Saving...' : entry ? 'Update' : 'Create'}
                 </Button>
                 <Button type="button" variant="secondary" onClick={() => router.back()}>

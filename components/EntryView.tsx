@@ -40,7 +40,7 @@ export default function EntryView({ entry }: { entry: Entry }) {
     return (
 
         <article className="">
-            <div className="flex justify-between items-start mb-2">
+            <div className=" mb-2">
                 <div>
                     <h1 className="entry-title">
                         {entry.title}
@@ -54,21 +54,6 @@ export default function EntryView({ entry }: { entry: Entry }) {
                             day: 'numeric'
                         })}
                     </time>
-                </div>
-                <div className="flex gap-2">
-                    <Link
-                        href={`/entries/${entry.id}/edit`}
-                        className={buttonStyles.secondary}
-                    >
-                        Edit
-                    </Link>
-                    <button
-                        onClick={handleDelete}
-                        disabled={deleting}
-                        className={buttonStyles.secondary}
-                    >
-                        {deleting ? 'Deleting...' : 'Delete'}
-                    </button>
                 </div>
             </div>
 
@@ -92,7 +77,22 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 </ReactMarkdown>
             </div>
 
-            
+            <div className="flex justify-end gap-4 pt-6 mt-6 border-t border-gray-200">
+                <Link
+                    href={`/entries/${entry.id}/edit`}
+                    className={buttonStyles.secondary}
+                >
+                    Edit
+                </Link>
+                <button
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className={buttonStyles.secondary}
+                >
+                    {deleting ? 'Deleting...' : 'Delete'}
+                </button>
+            </div>
+
         </article>
     )
 }
