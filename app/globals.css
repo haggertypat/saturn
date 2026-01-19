@@ -37,3 +37,11 @@
         @apply antialiased transition-colors duration-300;
     }
 }
+
+.scrollbar-none {
+    scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}

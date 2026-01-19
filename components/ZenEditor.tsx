@@ -1,91 +1,81 @@
-'use client'
+"use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
-// Hook to auto-grow textarea height
-function useAutoGrow(value: string) {
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-    useEffect(() => {
-        const textarea = textareaRef.current;
-        if (!textarea) return;
-
-        // Reset height to auto to get the correct scrollHeight
-        textarea.style.height = 'auto';
-        textarea.style.height = `${textarea.scrollHeight}px`;
-    }, [value]);
-
-    return textareaRef;
-}
-
-interface ZenEditorProps {
+type ZenEditorProps = {
     value: string;
     onChange: (value: string) => void;
     onExit: () => void;
-}
+};
 
-export default function ZenEditor({ value, onChange, onExit }: ZenEditorProps) {
-    const textareaRef = useAutoGrow(value);
+export default function ZenEditor({
+                                      value,
+                                      onChange,
+                                      onExit,
+                                  }: ZenEditorProps) {
+    const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
+    // Auto-grow textarea so the PAGE scrolls, not the textarea
     useEffect(() => {
-        // Focus textarea on mount
-        textareaRef.current?.focus();
+        const el = textareaRef.current;
+        if (!el) return;
+        el.style.height = "auto";
+        el.style.height = `${el.scrollHeight}px`;
+    }, [value]);
 
-        // Handle ESC key to exit
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
+    // ESC to exit zen mode
+    useEffect(() => {
+        const handler = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                e.preventDefault();
                 onExit();
             }
         };
-
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
+        window.addEventListener("keydown", handler);
+        return () => window.removeEventListener("keydown", handler);
     }, [onExit]);
 
-    // Prevent body scroll when mounted
-    useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, []);
-
     return (
-        <div className="fixed inset-0 bg-[var(--bg)] overflow-y-auto overflow-x-hidden scrollbar-hide">
-            <div className="min-h-screen py-[40vh] px-6">
-                <div className="max-w-2xl mx-auto">
-                    <div className="prose dark:prose-invert max-w-none">
-            <textarea
-                ref={textareaRef}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                className="w-full resize-none border-0 bg-transparent p-0 outline-none ring-0 focus:ring-0 focus:outline-none"
-                style={{
-                    whiteSpace: 'pre-wrap',
-                    fontFamily: 'inherit',
-                    fontSize: 'inherit',
-                    lineHeight: 'inherit',
-                    color: 'inherit',
-                }}
-                spellCheck={false}
-                autoCorrect="off"
-                autoComplete="off"
-                autoCapitalize="off"
-                rows={1}
-            />
-                    </div>
-                </div>
+        <div
+            className="
+        fixed inset-0 z-50
+        h-screen w-screen
+        overflow-y-auto
+        scrollbar-none
+        bg-white text-gray-900
+        dark:bg-black dark:text-gray-100
+      "
+        >
+            <div
+                className="
+          mx-auto
+          max-w-[42rem]
+          px-6
+          py-24
+          prose prose-neutral dark:prose-invert
+        "
+            >
+        <textarea
+            ref={textareaRef}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            spellCheck={false}
+            autoCorrect="off"
+            autoCapitalize="off"
+            autoComplete="off"
+            className="
+            block w-full
+            resize-none
+            bg-transparent
+            border-none
+            outline-none
+            focus:outline-none
+            font-inherit
+            leading-inherit
+            whitespace-pre-wrap
+          "
+        />
             </div>
-
-            <style jsx global>{`
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
         </div>
     );
 }
