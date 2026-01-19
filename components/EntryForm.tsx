@@ -115,22 +115,34 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             {hasDraft && lastSaved && (
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-gray-500 float-right">
                     Auto-saved {lastSaved.toLocaleTimeString()}
                 </div>
             )}
 
-            <div className="flex justify-between items-center mb-2">
-                <button
-                    type="button"
-                    onClick={() => setIsZenMode(true)}
-                    className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
-                >
-                    Zen mode
-                </button>
+
+            <div className="mb-6">
+                <input
+                    id="title"
+                    type="text"
+                    required
+                    maxLength={250}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Untitled"
+                    className="
+         entry-title
+    bg-transparent
+    border-none
+    outline-none
+    p-0
+    w-full
+    "
+                />
             </div>
 
-            <div className="float-right">
+            <div className="flex justify-between">
+                <div>
                 <input
                     id="event_date"
                     type="date"
@@ -139,19 +151,18 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                     onChange={(e) => setEventDate(e.target.value)}
                     className="px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                 />
-            </div>
+                </div>
 
-            <div>
-                <input
-                    id="title"
-                    type="text"
-                    required
-                    maxLength={250}
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-lg"
-                    placeholder="Entry title"
-                />
+                <div>
+                <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setIsZenMode(true)}
+                    className=""
+                >
+                    Zen mode
+                </Button>
+                </div>
             </div>
 
             <div>

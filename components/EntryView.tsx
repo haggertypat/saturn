@@ -42,9 +42,11 @@ export default function EntryView({ entry }: { entry: Entry }) {
         <article className="">
             <div className="flex justify-between items-start mb-2">
                 <div>
-                    <h1 className="text-3xl">
+                    <h1 className="entry-title">
                         {entry.title}
                     </h1>
+
+
                     <time className="text-sm">
                         {eventDate.toLocaleDateString('en-US', {
                             year: 'numeric',
