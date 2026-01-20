@@ -11,7 +11,6 @@ import {buttonStyles} from "@/lib/styles";
 import {Button} from "@/components/Button";
 import { fetchTopMatches } from "@/lib/entries";
 import EntryCard from "@/components/EntryCard";
-import type { RelatedEntryMatch } from "@/lib/types";
 
 function EmbeddingBadge({ status }: { status: string }) {
     const map: Record<string, string> = {
