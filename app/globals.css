@@ -24,7 +24,7 @@
 /* 2. Define the Dark variables - Use both selectors to be safe */
 :root.dark,
 .dark {
-    --bg: #0a0a0a;
+    --bg: #161616;
     --fg: #ededed;
     --brd: #262626;
 }
