@@ -2,6 +2,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import EntryList from '@/components/EntryList'
 import Header from '@/components/Header'
+import InfiniteEntryList from "@/components/InfiniteEntryList";
 
 export default async function Home() {
     const supabase = await createServerSupabaseClient()
@@ -12,16 +13,11 @@ export default async function Home() {
         redirect('/login')
     }
 
-    const { data: entries } = await supabase
-        .from('entries')
-        .select('*')
-        .order('event_date', { ascending: false })
-
     return (
         <div className="min-h-screen">
             <Header user={user} />
-            <main className="max-w-4xl mx-auto px-4 py-8">
-                <EntryList initialEntries={entries || []} />
+            <main className="max-w-2xl mx-auto py-10 px-4">
+                <InfiniteEntryList />
             </main>
         </div>
     )
