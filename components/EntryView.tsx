@@ -85,10 +85,26 @@ export function RelatedEntries({ entryId }: { entryId: string }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setLoading(true);
-        fetchTopMatches(entryId, 3)
-            .then(setMatches)
-            .finally(() => setLoading(false));
+        let cancelled = false; // prevent state update if component unmounts
+
+        async function loadMatches() {
+            setLoading(true);
+            try {
+                const results = await fetchTopMatches(entryId, 3);
+                if (!cancelled) setMatches(results); // safely update state
+            } catch (err) {
+                console.error("Failed to fetch matches:", err);
+                if (!cancelled) setMatches([]);
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        }
+
+        loadMatches();
+
+        return () => {
+            cancelled = true; // cleanup on unmount
+        };
     }, [entryId]);
 
     if (loading) return <p>Loading related entries…</p>;
