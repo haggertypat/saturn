@@ -7,3 +7,9 @@ export interface Entry {
     updated_at: string
     tags: string[]
 }
+
+export type RelatedEntryMatch = {
+    id: string;
+    body: string;
+    similarity: number;   // 0 to 1, as returned by the vector match
+};

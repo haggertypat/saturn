@@ -11,6 +11,7 @@ import {buttonStyles} from "@/lib/styles";
 import {Button} from "@/components/Button";
 import { fetchTopMatches } from "@/lib/entries";
 import EntryCard from "@/components/EntryCard";
+import type { RelatedEntryMatch } from "@/lib/types";
 
 function EmbeddingBadge({ status }: { status: string }) {
     const map: Record<string, string> = {
@@ -79,15 +80,35 @@ function EmbedControls({ entry }: { entry: any }) {
     );
 }
 
-function RelatedEntries({ entryId }: { entryId: string }) {
-    const [matches, setMatches] = useState<any[]>([]);
+interface RelatedEntriesProps {
+    entryId: string;
+}
+
+export function RelatedEntries({ entryId }: RelatedEntriesProps) {
+    const [matches, setMatches] = useState<RelatedEntryMatch[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setLoading(true);
-        fetchTopMatches(entryId, 3)
-            .then(setMatches)
-            .finally(() => setLoading(false));
+        let cancelled = false;
+
+        async function loadMatches() {
+            setLoading(true);
+            try {
+                const results = await fetchTopMatches(entryId, 3);
+                if (!cancelled) setMatches(results ?? []); // ensures array, never null
+            } catch (err) {
+                console.error("Failed to fetch related entries:", err);
+                if (!cancelled) setMatches([]);
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        }
+
+        loadMatches();
+
+        return () => {
+            cancelled = true;
+        };
     }, [entryId]);
 
     if (loading) return <p>Loading related entries…</p>;
@@ -96,19 +117,9 @@ function RelatedEntries({ entryId }: { entryId: string }) {
     return (
         <section className="mt-8">
             <h2 className="text-lg font-bold mb-2">Similar Entries</h2>
-            <ul className="list-disc ml-4">
-                {matches.map((m: any) => (
+                {matches.map((m) => (
                     <EntryCard key={m.id} entry={m} />
-
-                    // <li key={m.id}>
-                    //     <a href={`/entries/${m.id}`} className="underline text-blue-600">
-                    //         {m.body.slice(0, 100)}
-                    //         {m.body.length > 100 ? "…" : ""}
-                    //     </a>{" "}
-                    //     ({(m.similarity * 100).toFixed(1)}% match)
-                    // </li>
                 ))}
-            </ul>
         </section>
     );
 }
