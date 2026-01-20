@@ -90,7 +90,7 @@ export function RelatedEntries({ entryId }: { entryId: string }) {
         async function loadMatches() {
             setLoading(true);
             try {
-                const results = await fetchTopMatches(entryId, 3);
+                const results = await fetchTopMatches(entryId, 4);
                 if (!cancelled) setMatches(results); // safely update state
             } catch (err) {
                 console.error("Failed to fetch matches:", err);

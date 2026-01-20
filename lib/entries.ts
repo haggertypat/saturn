@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 
-export async function fetchTopMatches(entryId: string, limit = 3) {
+export async function fetchTopMatches(entryId: string, limit = 4) {
     const supabase = createClient();
 
     const { data: entry } = await supabase
