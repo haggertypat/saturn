@@ -11,7 +11,6 @@ import {buttonStyles} from "@/lib/styles";
 import {Button} from "@/components/Button";
 import { fetchTopMatches } from "@/lib/entries";
 import EntryCard from "@/components/EntryCard";
-import type { RelatedEntryMatch } from "@/lib/types";
 
 function EmbeddingBadge({ status }: { status: string }) {
     const map: Record<string, string> = {
@@ -80,46 +79,29 @@ function EmbedControls({ entry }: { entry: any }) {
     );
 }
 
-interface RelatedEntriesProps {
-    entryId: string;
-}
 
-export function RelatedEntries({ entryId }: RelatedEntriesProps) {
-    const [matches, setMatches] = useState<RelatedEntryMatch[]>([]);
+export function RelatedEntries({ entryId }: { entryId: string }) {
+    const [matches, setMatches] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        let cancelled = false;
-
-        async function loadMatches() {
-            setLoading(true);
-            try {
-                const results = await fetchTopMatches(entryId, 3);
-                if (!cancelled) setMatches(results ?? []); // ensures array, never null
-            } catch (err) {
-                console.error("Failed to fetch related entries:", err);
-                if (!cancelled) setMatches([]);
-            } finally {
-                if (!cancelled) setLoading(false);
-            }
-        }
-
-        loadMatches();
-
-        return () => {
-            cancelled = true;
-        };
+        setLoading(true);
+        fetchTopMatches(entryId, 3)
+            .then(setMatches)
+            .finally(() => setLoading(false));
     }, [entryId]);
 
     if (loading) return <p>Loading related entries…</p>;
-    if (matches.length === 0) return null;
+    if (!matches.length) return null;
 
     return (
         <section className="mt-8">
             <h2 className="text-lg font-bold mb-2">Similar Entries</h2>
+            <div>
                 {matches.map((m) => (
                     <EntryCard key={m.id} entry={m} />
                 ))}
+            </div>
         </section>
     );
 }

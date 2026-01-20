@@ -8,8 +8,19 @@ export interface Entry {
     tags: string[]
 }
 
-export type RelatedEntryMatch = {
+// Partial match returned by the SQL RPC
+export type RelatedEntryMatchPartial = {
     id: string;
     body: string;
-    similarity: number;   // 0 to 1, as returned by the vector match
+    similarity: number;
+};
+
+// Full entry with similarity attached
+export type RelatedEntryFull = {
+    id: string;
+    title: string;
+    body: string;
+    event_date: string;
+    tags: string[];
+    similarity: number; // preserved from RPC
 };

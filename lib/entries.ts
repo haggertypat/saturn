@@ -1,37 +1,37 @@
-// lib/entries.ts
-import {createClient} from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 
 export async function fetchTopMatches(entryId: string, limit = 3) {
-    const supabase = createClient()
+    const supabase = createClient();
 
-    // fetch the entry embedding first
-    const { data: entry, error: entryError } = await supabase
+    const { data: entry } = await supabase
         .from("entries")
-        .select("id, embedding")
+        .select("embedding")
         .eq("id", entryId)
         .single();
 
-    if (entryError || !entry?.embedding) return [];
+    if (!entry?.embedding) return [];
 
-    // call your SQL function
-    const { data: matches, error: matchError } = await supabase
-        .rpc("match_entries", {
-            query_embedding: entry.embedding,
-            match_count: limit,
-        });
+    const { data: matches } = await supabase.rpc("match_entries", {
+        query_embedding: entry.embedding,
+        match_count: limit,
+    });
 
-    if (matchError) {
-        console.error("Error fetching matches:", matchError);
-        return [];
-    }
+    if (!matches) return [];
 
-    // filter out the current entry
+    // matches is now [{id, similarity}, ...]
     const filteredMatches = matches.filter((m: any) => m.id !== entryId);
-    const ids = filteredMatches.map(m => m.id)
-    const { data: entries } = await supabase
-        .from('entries')
-        .select('*')
-        .in('id', ids)
-    return entries
+    const ids = filteredMatches.map((m: any) => m.id);
+    const { data: fullEntries } = await supabase
+        .from("entries")
+        .select("*")
+        .in("id", ids);
 
+    if (!fullEntries) return [];
+
+
+    // merge similarity into full entries
+    return fullEntries.map((entry: any) => {
+        const match = matches.find((m: any) => m.id === entry.id);
+        return { ...entry, similarity: match?.similarity ?? 0 };
+    });
 }
