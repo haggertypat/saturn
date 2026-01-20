@@ -93,6 +93,15 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                 setError(error.message)
                 setLoading(false)
             } else {
+                fetch("/api/embed-entry", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        id: data.id,
+                        body: entryData.body,
+                    }),
+                });
+
                 clearDraft()
                 router.push(`/entries/${data.id}`)
                 router.refresh()

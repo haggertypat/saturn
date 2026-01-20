@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
@@ -8,6 +8,111 @@ import remarkGfm from 'remark-gfm'
 import type { Entry } from '@/lib/types'
 import { createClient } from '@/lib/supabase/client'
 import {buttonStyles} from "@/lib/styles";
+import {Button} from "@/components/Button";
+import { fetchTopMatches } from "@/lib/entries";
+import EntryCard from "@/components/EntryCard";
+import type { RelatedEntryMatch } from "@/lib/types";
+
+function EmbeddingBadge({ status }: { status: string }) {
+    const map: Record<string, string> = {
+        complete: "bg-green-100 text-green-800",
+        pending: "bg-yellow-100 text-yellow-800",
+        failed: "bg-red-100 text-red-800",
+    };
+
+    return (
+        <span
+            className={`text-xs px-2 py-1 rounded ${map[status] ?? "bg-gray-100"}`}
+        >
+      {status}
+    </span>
+    );
+}
+
+function EmbedControls({ entry }: { entry: any }) {
+    const [status, setStatus] = useState(entry.embedding_status);
+    const [running, setRunning] = useState(false);
+
+    async function rerunEmbedding() {
+        setRunning(true);
+        setStatus("pending");
+
+        try {
+            await fetch("/api/embed-entry", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: entry.id,
+                    body: entry.body,
+                }),
+            });
+
+            // optimistic success
+            setStatus("complete");
+        } catch {
+            setStatus("failed");
+        } finally {
+            setRunning(false);
+        }
+    }
+
+    return (
+        <div className="flex items-center gap-2">
+            <EmbeddingBadge status={status} />
+
+            <Button
+                onClick={rerunEmbedding}
+                variant="ghost"
+                disabled={running}
+                className="text-xs"
+            >
+                {running ? "Embedding…" : "Re-run embedding"}
+            </Button>
+
+            <Button
+                variant="ghost"
+                className="text-xs"
+                onClick={() => fetch("/api/embed-pending", { method: "POST" })}
+            >
+                Embed all pending
+            </Button>
+        </div>
+    );
+}
+
+function RelatedEntries({ entryId }: { entryId: string }) {
+    const [matches, setMatches] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setLoading(true);
+        fetchTopMatches(entryId, 3)
+            .then(setMatches)
+            .finally(() => setLoading(false));
+    }, [entryId]);
+
+    if (loading) return <p>Loading related entries…</p>;
+    if (matches.length === 0) return null;
+
+    return (
+        <section className="mt-8">
+            <h2 className="text-lg font-bold mb-2">Similar Entries</h2>
+            <ul className="list-disc ml-4">
+                {matches.map((m: any) => (
+                    <EntryCard key={m.id} entry={m} />
+
+                    // <li key={m.id}>
+                    //     <a href={`/entries/${m.id}`} className="underline text-blue-600">
+                    //         {m.body.slice(0, 100)}
+                    //         {m.body.length > 100 ? "…" : ""}
+                    //     </a>{" "}
+                    //     ({(m.similarity * 100).toFixed(1)}% match)
+                    // </li>
+                ))}
+            </ul>
+        </section>
+    );
+}
 
 export default function EntryView({ entry }: { entry: Entry }) {
     const router = useRouter()
@@ -16,6 +121,7 @@ export default function EntryView({ entry }: { entry: Entry }) {
 
     const [year, month, day] = entry.event_date.split('-')
     const eventDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+
 
     const handleDelete = async () => {
         if (!confirm('Are you sure you want to delete this entry?')) {
@@ -93,6 +199,9 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 </button>
             </div>
 
+            {/*<EmbedControls entry={entry}></EmbedControls>*/}
+
+            <RelatedEntries entryId={entry.id} />
         </article>
     )
 }
