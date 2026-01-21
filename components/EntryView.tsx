@@ -29,28 +29,24 @@ function EmbeddingBadge({ status }: { status: string }) {
     );
 }
 
-function EmbedControls({ entry }: { entry: Entry }) {
-    const [status, setStatus] = useState(entry.embedding_status);
+function EmbedControls({
+                           entryId,
+                           status,
+                       }: {
+    entryId: string;
+    status: Entry["embedding_status"];
+}) {
     const [running, setRunning] = useState(false);
 
     async function rerunEmbedding() {
         setRunning(true);
-        setStatus("pending");
 
         try {
             await fetch("/api/embed-entry", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    id: entry.id,
-                    body: entry.body,
-                }),
+                body: JSON.stringify({ id: entryId }),
             });
-
-            // optimistic success
-            setStatus("complete");
-        } catch {
-            setStatus("failed");
         } finally {
             setRunning(false);
         }
@@ -79,7 +75,6 @@ function EmbedControls({ entry }: { entry: Entry }) {
         </div>
     );
 }
-
 
 export function RelatedEntries({ entryId }: { entryId: string }) {
     const [matches, setMatches] = useState<EntryWithSimilarity[]>([]);
@@ -141,6 +136,39 @@ export default function EntryView({ entry }: { entry: Entry }) {
         Number(month) - 1,
         Number(day)
     )
+
+    const [currentEntry, setCurrentEntry] = useState(entry);
+
+    useEffect(() => {
+        // Only poll if we expect a change
+        if (currentEntry.embedding_status === "complete") return;
+
+        let cancelled = false;
+
+        const poll = async () => {
+            const res = await fetch(`/api/entries/${currentEntry.id}`);
+            const updated = await res.json();
+            console.log("polled entry", {
+                status: updated.embedding_status,
+                hasEmbedding: !!updated.embedding,
+            });
+            console.log(updated)
+            if (cancelled) return;
+
+            setCurrentEntry(updated);
+
+            if (updated.embedding_status !== "complete") {
+                setTimeout(poll, 1500);
+            }
+        };
+
+        poll();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [currentEntry.id, currentEntry.embedding_status]);
+
 
     const handleDelete = async () => {
         if (!confirm('Are you sure you want to delete this entry?')) {
@@ -205,9 +233,12 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 </button>
             </div>
 
-            <EmbedControls entry={entry}></EmbedControls>
+            <EmbedControls entryId={currentEntry.id} status={currentEntry.embedding_status}></EmbedControls>
 
-            <RelatedEntries entryId={entry.id} />
+            {currentEntry.embedding_status === "complete" &&
+                currentEntry.embedding != null && (
+                    <RelatedEntries entryId={currentEntry.id} />
+            )}
         </article>
     )
 }

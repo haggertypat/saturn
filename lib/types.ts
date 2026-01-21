@@ -7,6 +7,7 @@ export interface Entry {
     updated_at: string
     tags: string[]
     embedding_status: string
+    embedding: number
 }
 
 // Partial match returned by the SQL RPC
