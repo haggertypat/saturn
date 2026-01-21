@@ -9,7 +9,7 @@ export default function EntryList() {
     const [loading, setLoading] = useState(false)
     const [hasMore, setHasMore] = useState(true)
     const nextCursorRef = useRef<string | null>(null)
-    const observerRef = useRef<IntersectionObserver>()
+    const observerRef = useRef<IntersectionObserver>(null)
     const entriesRef = useRef<Entry[]>([])
 
     const fetchEntries = async (cursor?: string) => {
