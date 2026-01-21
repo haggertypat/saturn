@@ -2,12 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import type { Entry } from '@/lib/types'
 import { createClient } from '@/lib/supabase/client'
-import {buttonStyles} from "@/lib/styles";
 import {Button} from "@/components/Button";
 import { fetchTopMatches } from "@/lib/entries";
 import EntryCard from "@/components/EntryCard";
@@ -218,19 +216,19 @@ export default function EntryView({ entry }: { entry: Entry }) {
             </div>
 
             <div className="flex justify-end gap-4 pt-6 mt-6 border-t border-gray-200">
-                <Link
+                <Button
                     href={`/entries/${entry.id}/edit`}
-                    className={buttonStyles.secondary}
+                    variant="secondary"
                 >
                     Edit
-                </Link>
-                <button
+                </Button>
+                <Button
                     onClick={handleDelete}
                     disabled={deleting}
-                    className={buttonStyles.secondary}
+                    variant="secondary"
                 >
                     {deleting ? 'Deleting...' : 'Delete'}
-                </button>
+                </Button>
             </div>
 
             <EmbedControls entryId={currentEntry.id} status={currentEntry.embedding_status}></EmbedControls>

@@ -4,6 +4,9 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ThemeToggle } from './ThemeToggle'
+import { PlusCircleIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/outline'
+import {Button} from "@/components/Button";
+
 
 export default function Header() {
     const router = useRouter()
@@ -23,21 +26,23 @@ export default function Header() {
                         href="/">Saturn</Link>
                 </h1>
                 <div className="flex items-right">
-                    <Link
+                    <Button
                         href="/entries/new"
-                        className="text-sm mr-2"
+                        variant="ghost"
+                        className="inline-flex items-center gap-1"
                     >
-                        New
-                    </Link>
+                        <PlusCircleIcon className="h-5 w-5" /> New
+                    </Button>
 
                     <ThemeToggle />
 
-                    <button
+                    <Button
                         onClick={handleLogout}
-                        className="text-sm cursor-pointer"
+                        variant="ghost"
+                        className="inline-flex items-center gap-1"
                     >
-                        Sign Out
-                    </button>
+                        <ArrowRightStartOnRectangleIcon className="h-5 w-5" /> Sign Out
+                    </Button>
                 </div>
             </div>
         </header>

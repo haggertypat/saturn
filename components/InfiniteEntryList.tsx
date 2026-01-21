@@ -128,7 +128,7 @@ export default function EntryList() {
                 <button
                     type="button"
                     onClick={() => setOrder(o => (o === 'desc' ? 'asc' : 'desc'))}
-                    className="rounded-md border border-zinc-200 px-3 text-sm dark:border-zinc-800"
+                    className="rounded-md border cursor-pointer border-zinc-200 px-3 text-sm dark:border-zinc-800"
                     title="Toggle date order"
                 >
                     {order === 'desc' ? 'Newest' : 'Oldest'}
