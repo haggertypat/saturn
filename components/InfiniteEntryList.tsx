@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import EntryCard from './EntryCard'
 import type { Entry } from '@/lib/types'
+import {Button} from "@/components/Button"
 
 function useDebouncedValue<T>(value: T, delayMs: number) {
     const [debounced, setDebounced] = useState(value)
@@ -125,14 +126,13 @@ export default function EntryList() {
                      focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:border-zinc-800"
                 />
 
-                <button
-                    type="button"
+                <Button
                     onClick={() => setOrder(o => (o === 'desc' ? 'asc' : 'desc'))}
-                    className="rounded-md border cursor-pointer border-zinc-200 px-3 text-sm dark:border-zinc-800"
                     title="Toggle date order"
+                    variant="secondary"
                 >
                     {order === 'desc' ? 'Newest' : 'Oldest'}
-                </button>
+                </Button>
             </div>
 
             {entries.map((entry, i) => {
