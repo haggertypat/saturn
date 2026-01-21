@@ -12,13 +12,19 @@ export default function EntryList() {
     const observerRef = useRef<IntersectionObserver>(null)
     const entriesRef = useRef<Entry[]>([])
 
+    type EntriesResponse = {
+        data: Entry[]
+        nextCursor: string | null
+    }
+
     const fetchEntries = async (cursor?: string) => {
         if (loading || !hasMore) return
         setLoading(true)
 
         try {
             const res = await fetch(`/api/entries?cursor=${cursor || ''}`)
-            const { data, nextCursor } = await res.json()
+            const json: EntriesResponse = await res.json()
+            const { data, nextCursor } = json
 
             // Deduplicate just in case
             const newEntries = data.filter(d => !entriesRef.current.some(e => e.id === d.id))
@@ -54,8 +60,11 @@ export default function EntryList() {
             if (node) {
                 observerRef.current = new IntersectionObserver(
                     (entries) => {
-                        if (entries[0].isIntersecting && hasMore) {
-                            fetchEntries(nextCursorRef.current!)
+                        const first = entries[0]
+                        if (!first) return
+
+                        if (first.isIntersecting && hasMore) {
+                            fetchEntries(nextCursorRef.current)
                         }
                     },
                     { rootMargin: '200px' }

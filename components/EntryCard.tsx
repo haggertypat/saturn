@@ -8,8 +8,20 @@ interface EntryCardProps {
 }
 
 const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry }, ref) => {
-    const [year, month, day] = entry.event_date.split('-')
-    const eventDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    const parts = entry.event_date.split('-')
+
+    if (parts.length !== 3) {
+        throw new Error(`Invalid event_date: ${entry.event_date}`)
+    }
+
+    const [year, month, day] = parts
+
+    const eventDate = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day)
+    )
+
     const preview = entry.body.slice(0, 200) + (entry.body.length > 200 ? '...' : '')
 
     return (
