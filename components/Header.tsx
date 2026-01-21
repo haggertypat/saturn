@@ -2,11 +2,10 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import type { User } from '@supabase/supabase-js'
 import Link from 'next/link'
 import { ThemeToggle } from './ThemeToggle'
 
-export default function Header({ user }: { user: User }) {
+export default function Header() {
     const router = useRouter()
     const supabase = createClient()
 

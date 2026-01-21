@@ -5,10 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:strict": "next build && next lint && tsc --noEmit",
+    "type-check": "tsc --noEmit",
+    "build:strict": "pnpm type-check && pnpm lint && next build",
     "start": "next start",
-    "lint": "eslint",
-    "prepare": "husky"
+    "lint": "eslint"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
@@ -29,7 +29,6 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.2",
-    "husky": "^9.1.7",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

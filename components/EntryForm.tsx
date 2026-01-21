@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Entry } from '@/lib/types'
-import TagInput from './TagInput'
 import { Button } from "@/components/Button"
 import ZenEditor from './ZenEditor'  // Add this import
 
@@ -47,9 +46,13 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
 
     // Auto-save to localStorage
     useEffect(() => {
-        const draft = { title, body, eventDate, tags }
-        localStorage.setItem(storageKey, JSON.stringify(draft))
-        setLastSaved(new Date())
+        const timer = setTimeout(() => {
+            const draft = { title, body, eventDate, tags }
+            localStorage.setItem(storageKey, JSON.stringify(draft))
+            setLastSaved(new Date())
+        }, 500) // Wait 500ms after last change
+
+        return () => clearTimeout(timer)
     }, [title, body, eventDate, tags, storageKey])
 
     const clearDraft = () => {
@@ -175,11 +178,6 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                     placeholder="Write your entry..."
                 />
             </div>
-
-
-            {/*<div>*/}
-            {/*    <TagInput tags={tags} onChange={setTags} />*/}
-            {/*</div>*/}
 
             {error && (
                 <div className="text-red-600 text-sm">{error}</div>

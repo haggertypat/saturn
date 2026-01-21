@@ -11,6 +11,7 @@ import {buttonStyles} from "@/lib/styles";
 import {Button} from "@/components/Button";
 import { fetchTopMatches } from "@/lib/entries";
 import EntryCard from "@/components/EntryCard";
+import {EntryWithSimilarity} from "@/lib/entries";
 
 function EmbeddingBadge({ status }: { status: string }) {
     const map: Record<string, string> = {
@@ -28,7 +29,7 @@ function EmbeddingBadge({ status }: { status: string }) {
     );
 }
 
-function EmbedControls({ entry }: { entry: any }) {
+function EmbedControls({ entry }: { entry: Entry }) {
     const [status, setStatus] = useState(entry.embedding_status);
     const [running, setRunning] = useState(false);
 
@@ -68,20 +69,20 @@ function EmbedControls({ entry }: { entry: any }) {
                 {running ? "Embedding…" : "Re-run embedding"}
             </Button>
 
-            <Button
-                variant="ghost"
-                className="text-xs"
-                onClick={() => fetch("/api/embed-pending", { method: "POST" })}
-            >
-                Embed all pending
-            </Button>
+            {/*<Button*/}
+            {/*    variant="ghost"*/}
+            {/*    className="text-xs"*/}
+            {/*    onClick={() => fetch("/api/embed-pending", { method: "POST" })}*/}
+            {/*>*/}
+            {/*    Embed all pending*/}
+            {/*</Button>*/}
         </div>
     );
 }
 
 
 export function RelatedEntries({ entryId }: { entryId: string }) {
-    const [matches, setMatches] = useState<any[]>([]);
+    const [matches, setMatches] = useState<EntryWithSimilarity[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -140,7 +141,7 @@ export default function EntryView({ entry }: { entry: Entry }) {
         Number(month) - 1,
         Number(day)
     )
-    
+
     const handleDelete = async () => {
         if (!confirm('Are you sure you want to delete this entry?')) {
             return
@@ -181,19 +182,6 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 </div>
             </div>
 
-            {/*{entry.tags.length > 0 && (*/}
-            {/*    <div className="flex flex-wrap gap-2 mb-2">*/}
-            {/*        {entry.tags.map((tag) => (*/}
-            {/*            <span*/}
-            {/*                key={tag}*/}
-            {/*                className="text-xs px-2 py-1 bg-gray-100 text-gray-700"*/}
-            {/*            >*/}
-            {/*  {tag}*/}
-            {/*</span>*/}
-            {/*        ))}*/}
-            {/*    </div>*/}
-            {/*)}*/}
-
             <div className="prose dark:prose-invert max-w-none mt-6">
 
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -217,7 +205,7 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 </button>
             </div>
 
-            {/*<EmbedControls entry={entry}></EmbedControls>*/}
+            <EmbedControls entry={entry}></EmbedControls>
 
             <RelatedEntries entryId={entry.id} />
         </article>

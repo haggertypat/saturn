@@ -15,14 +15,14 @@ export async function createServerSupabaseClient() {
                 set(name: string, value: string, options: CookieOptions) {
                     try {
                         cookieStore.set({ name, value, ...options })
-                    } catch (error) {
+                    } catch {
                         // Server component, ignore
                     }
                 },
                 remove(name: string, options: CookieOptions) {
                     try {
                         cookieStore.set({ name, value: '', ...options })
-                    } catch (error) {
+                    } catch {
                         // Server component, ignore
                     }
                 },

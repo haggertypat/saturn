@@ -24,6 +24,7 @@ export async function tryEmbedEntry(entryId: string, body: string) {
                 embedding_error: null,
             })
             .eq("id", entryId);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         await supabase
             .from("entries")

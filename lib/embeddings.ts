@@ -10,5 +10,10 @@ export async function embedText(text: string): Promise<number[]> {
         input: text,
     });
 
-    return res.data[0].embedding;
+    const first = res.data[0]
+    if (!first) {
+        throw new Error("No embedding returned from OpenAI")
+    }
+
+    return first.embedding;
 }

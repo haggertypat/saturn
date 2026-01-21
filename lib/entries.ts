@@ -1,6 +1,16 @@
 import { createClient } from "@/lib/supabase/client";
+import type { Entry } from '@/lib/types'
 
-export async function fetchTopMatches(entryId: string, limit = 4) {
+type MatchResult = {
+    id: string;
+    similarity: number;
+};
+
+export type EntryWithSimilarity = Entry & {
+    similarity: number;
+};
+
+export async function fetchTopMatches(entryId: string, limit = 4): Promise<EntryWithSimilarity[]> {
     const supabase = createClient();
 
     const { data: entry } = await supabase
@@ -18,9 +28,9 @@ export async function fetchTopMatches(entryId: string, limit = 4) {
 
     if (!matches) return [];
 
-    // matches is now [{id, similarity}, ...]
-    const filteredMatches = matches.filter((m: any) => m.id !== entryId);
-    const ids = filteredMatches.map((m: any) => m.id);
+    const filteredMatches = (matches as MatchResult[]).filter((m) => m.id !== entryId);
+    const ids = filteredMatches.map((m) => m.id);
+
     const { data: fullEntries } = await supabase
         .from("entries")
         .select("*")
@@ -28,10 +38,8 @@ export async function fetchTopMatches(entryId: string, limit = 4) {
 
     if (!fullEntries) return [];
 
-
-    // merge similarity into full entries
-    return fullEntries.map((entry: any) => {
-        const match = matches.find((m: any) => m.id === entry.id);
+    return (fullEntries as Entry[]).map((entry) => {
+        const match = filteredMatches.find((m) => m.id === entry.id);
         return { ...entry, similarity: match?.similarity ?? 0 };
     });
 }

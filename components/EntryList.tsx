@@ -1,16 +1,11 @@
 'use client'
 
-import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import type { Entry } from '@/lib/types'
 import EntryCard from './EntryCard'
-import Link from 'next/link'
-import {Button} from "@/components/Button";
 
 export default function EntryList({ initialEntries }: { initialEntries: Entry[] }) {
     const [entries] = useState<Entry[]>(initialEntries)
-    const router = useRouter()
 
     return (
         <div className="space-y-6">

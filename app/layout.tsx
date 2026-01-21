@@ -1,12 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { Source_Serif_4, Inter } from 'next/font/google'
+import { Source_Serif_4 } from 'next/font/google'
 import { ThemeInit } from '@/components/ThemeInit'
-
-const inter = Inter({
-    subsets: ['latin'],
-    variable: '--font-sans'
-})
 
 const sourceSerif = Source_Serif_4({
     subsets: ['latin'],

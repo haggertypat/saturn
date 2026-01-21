@@ -17,7 +17,7 @@ export default function EntryList() {
         nextCursor: string | null
     }
 
-    const fetchEntries = async (cursor?: string) => {
+    const fetchEntries = useCallback(async (cursor?: string | null) => {
         if (loading || !hasMore) return
         setLoading(true)
 
@@ -42,7 +42,7 @@ export default function EntryList() {
         } finally {
             setLoading(false)
         }
-    }
+    }, [loading, hasMore])
 
     useEffect(() => {
         if (entriesRef.current.length === 0) {
@@ -50,6 +50,7 @@ export default function EntryList() {
         } else {
             setEntries(entriesRef.current) // restore previous entries
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const lastEntryRef = useCallback(
@@ -72,7 +73,7 @@ export default function EntryList() {
                 observerRef.current.observe(node)
             }
         },
-        [loading, hasMore]
+        [loading, hasMore, fetchEntries]
     )
 
     return (

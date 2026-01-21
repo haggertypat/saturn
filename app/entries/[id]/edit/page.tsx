@@ -28,7 +28,7 @@ export default async function EditEntry({
 
     return (
         <div className="min-h-screen">
-            <Header user={user} />
+            <Header />
             <main className="mx-auto max-w-2xl px-6 py-16">
                 <EntryForm entry={entry} />
             </main>
