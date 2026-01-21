@@ -155,7 +155,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                     required
                     value={eventDate}
                     onChange={(e) => setEventDate(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-500 focus:border-transparent"
                 />
                 </div>
 
@@ -174,7 +174,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                     required
                     value={body}
                     onChange={(e) => setBody(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-base leading-relaxed min-h-[400px] resize-y"
+                    className="w-full px-4 py-3 border border-gray-300 focus:outline-none rounded-md focus:ring-1 focus:ring-neutral-500 focus:border-transparent text-base leading-relaxed min-h-[400px] resize-y"
                     placeholder="Write your entry..."
                 />
             </div>

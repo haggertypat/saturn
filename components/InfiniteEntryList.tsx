@@ -91,7 +91,7 @@ export default function EntryList() {
 
             {loading &&
                 Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="p-4 bg-gray-100 animate-pulse rounded-md h-20" />
+                    <div key={i} className="p-4 bg-gray-100 dark:bg-neutral-900 animate-pulse rounded-md h-20" />
                 ))}
 
             {!hasMore && !loading && (

@@ -27,7 +27,7 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry }, ref) =>
     return (
         <div ref={ref}> {/* observer attached here */}
             <Link href={`/entries/${entry.id}`}>
-            <article className="border border-gray-200 p-6 mb-1.5 hover:border-gray-400 transition-colors cursor-pointer">
+            <article className="border border-gray-200 rounded-md p-6 mb-1.5 hover:border-gray-400 transition-colors cursor-pointer">
                 <div className="flex justify-between items-start mb-2">
                     <h3 className="text-lg font-medium ">{entry.title}</h3>
                     <time className="text-sm">
