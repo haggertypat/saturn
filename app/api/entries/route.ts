@@ -10,12 +10,12 @@ export async function GET(req: Request) {
     const cursor = url.searchParams.get("cursor"); // encoded JSON string
     const qRaw = url.searchParams.get("q") ?? "";
     const q = qRaw.trim();
+    const order = url.searchParams.get('order') === 'asc' ? 'asc' : 'desc'
 
     let query = supabase
         .from("entries")
         .select("*")
-        .order("event_date", { ascending: false })
-        .order("id", { ascending: false })
+        .order('event_date', { ascending: order === 'asc' })
         .limit(LIMIT);
 
     if (q.length > 0) {
@@ -34,9 +34,14 @@ export async function GET(req: Request) {
 
         // Fetch rows "after" the cursor in our (event_date desc, id desc) ordering:
         // (event_date < c.event_date) OR (event_date = c.event_date AND id < c.id)
-        query = query.or(
-            `event_date.lt.${c.event_date},and(event_date.eq.${c.event_date},id.lt.${c.id})`
-        );
+        query =
+            order === 'asc'
+                ? query.or(
+                    `event_date.gt.${c.event_date},and(event_date.eq.${c.event_date},id.gt.${c.id})`
+                )
+                : query.or(
+                    `event_date.lt.${c.event_date},and(event_date.eq.${c.event_date},id.lt.${c.id})`
+                )
     }
 
     const { data, error } = await query;
