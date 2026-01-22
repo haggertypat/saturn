@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Entry } from '@/lib/types'
 import { Button } from '@/components/Button'
 import ZenEditor from './ZenEditor'
+import {ArrowsPointingOutIcon} from "@heroicons/react/24/outline";
 
 type DraftPayload = {
     title: string
@@ -266,16 +267,13 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                         required
                         value={eventDate}
                         onChange={(e) => setEventDate(e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-500 focus:border-transparent"
+                        className="pl-3 pr-0 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-500 focus:border-transparent"
                     />
                 </div>
-
-                <div className="flex items-center">
-                    {mounted && hasUnsavedChanges && lastSaved && (
-                        <div className="text-sm mr-2 text-gray-400 dark:text-gray-500">
-                            Auto-saved {lastSaved.toLocaleTimeString()}
-                        </div>
-                    )}
+                <div>
+                    <Button type="button" variant="ghost" onClick={() => setIsZenMode(true)}>
+                        <ArrowsPointingOutIcon className="h-5 w-5" />
+                    </Button>
                 </div>
             </div>
 
@@ -285,7 +283,8 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                     required
                     value={body}
                     onChange={(e) => setBody(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 focus:outline-none rounded-md focus:ring-1 focus:ring-neutral-500 focus:border-transparent text-base leading-relaxed min-h-[400px] resize-y"
+                    className="w-full px-4 py-3 border border-gray-300 focus:outline-none rounded-md focus:ring-1 focus:ring-neutral-500 focus:border-transparent
+                     text-base leading-relaxed min-h-[425px] resize-none"
                     placeholder="Write your entry..."
                 />
             </div>
@@ -293,10 +292,6 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
             {error && <div className="text-red-600 text-sm">{error}</div>}
 
             <div className="flex gap-4 justify-end">
-                <Button type="button" variant="ghost" onClick={() => setIsZenMode(true)}>
-                    Zen mode
-                </Button>
-
                 <Button type="submit" variant="primary" disabled={loading}>
                     {loading ? 'Saving...' : entry ? 'Update' : 'Create'}
                 </Button>
@@ -304,11 +299,18 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                 <Button type="button" variant="secondary" onClick={() => router.back()}>
                     Cancel
                 </Button>
-
+            </div>
+            <div className="flex gap-4 justify-end items-center">
+                {mounted && hasUnsavedChanges && lastSaved && (
+                    <div className="text-sm text-gray-400 dark:text-gray-500">
+                        Auto-saved {lastSaved.toLocaleTimeString()}
+                    </div>
+                )}
                 {mounted && hasUnsavedChanges && (
                     <Button
                         type="button"
                         variant="ghost"
+                        className="text-sm mr-2 text-gray-400 dark:text-gray-500"
                         onClick={() => {
                             const msg = entry
                                 ? 'Discard unsaved changes and revert to the saved entry?'

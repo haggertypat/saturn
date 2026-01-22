@@ -19,19 +19,24 @@ function EmbeddingBadge({ status }: { status: string }) {
     };
 
     return (
-        <span
-            className={`text-xs px-2 py-1 rounded ${map[status] ?? "bg-gray-100"}`}
-        >
-      {status}
-    </span>
-    );
+        <div>
+            <span className="text-xs px-2 py-1">Embedding status: </span>
+            <span
+                className={`text-xs px-2 py-1 rounded ${map[status] ?? "bg-gray-100"}`}
+            >
+                {status}
+            </span>
+        </div>
+    )
 }
 
 function EmbedControls({
                            entryId,
+                           body,
                            status,
                        }: {
     entryId: string;
+    body: string;
     status: Entry["embedding_status"];
 }) {
     const [running, setRunning] = useState(false);
@@ -43,7 +48,7 @@ function EmbedControls({
             await fetch("/api/embed-entry", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id: entryId }),
+                body: JSON.stringify({ id: entryId, body: body }),
             });
         } finally {
             setRunning(false);
@@ -60,7 +65,7 @@ function EmbedControls({
                 disabled={running}
                 className="text-xs"
             >
-                {running ? "Embedding…" : "Re-run embedding"}
+                {running ? "Embedding…" : "Re-run"}
             </Button>
 
             {/*<Button*/}
@@ -231,7 +236,9 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 </Button>
             </div>
 
-            <EmbedControls entryId={currentEntry.id} status={currentEntry.embedding_status}></EmbedControls>
+            <div className="flex justify-end mt-6">
+                <EmbedControls entryId={currentEntry.id} body={currentEntry.body} status={currentEntry.embedding_status}></EmbedControls>
+            </div>
 
             {currentEntry.embedding_status === "complete" &&
                 currentEntry.embedding != null && (

@@ -48,3 +48,17 @@
 .entry-title {
     @apply text-3xl font-bold leading-tight;
 }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+}
+
+input[type="date"]::-webkit-inner-spin-button {
+    display: none;
+}
+
+input[type="date"] {
+    appearance: none;
+    padding-right: 0; /* reclaim space */
+}
