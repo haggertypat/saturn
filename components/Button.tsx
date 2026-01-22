@@ -21,11 +21,11 @@ export function Button({
                        }: ButtonProps) {
     const styles = {
         primary:
-            "cursor-pointer bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200 px-4 py-2 rounded",
+            "cursor-pointer bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200 px-4 py-2 rounded",
         secondary:
-            "cursor-pointer border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 px-4 py-2 rounded",
+            "cursor-pointer border border-neutral-300 dark:border-neutral-600 text-neutral-900 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 px-4 py-2 rounded",
         ghost:
-            "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 px-4 py-2 rounded",
+            "cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 px-4 py-2 rounded",
     };
 
     const classes = `${styles[variant]} ${className}`;
