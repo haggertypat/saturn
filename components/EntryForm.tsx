@@ -256,6 +256,8 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                         outline-none
                         p-0
                         w-full
+                        text-neutral-900 dark:text-neutral-100
+                        placeholder:text-gray-400 dark:placeholder:text-neutral-500
                         "
                 />
             </div>
