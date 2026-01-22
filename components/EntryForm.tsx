@@ -1,62 +1,189 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Entry } from '@/lib/types'
-import { Button } from "@/components/Button"
-import ZenEditor from './ZenEditor'  // Add this import
+import { Button } from '@/components/Button'
+import ZenEditor from './ZenEditor'
+
+type DraftPayload = {
+    title: string
+    body: string
+    eventDate: string
+    tags: string[]
+    updatedAt: number
+    baseHash?: string // only for edit drafts
+}
+
+function stableStringify(obj: unknown) {
+    return JSON.stringify(obj, Object.keys(obj as any).sort())
+}
+
+// lightweight “hash” good enough for change detection (not crypto)
+function hashEntryFields(e: { title: string; body: string; eventDate: string; tags: string[] }) {
+    return stableStringify({
+        title: e.title,
+        body: e.body,
+        eventDate: e.eventDate,
+        tags: [...e.tags].sort(),
+    })
+}
 
 export default function EntryForm({ entry }: { entry?: Entry }) {
     const router = useRouter()
     const supabase = createClient()
+
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [lastSaved, setLastSaved] = useState<Date | null>(null)
-    const [isZenMode, setIsZenMode] = useState(false)  // Add this state
+    const [isZenMode, setIsZenMode] = useState(false)
 
-    const storageKey = entry ? `entry-draft-${entry.id}` : 'entry-draft-new'
-
-    // Initialize state from localStorage or entry
-    const getInitialState = () => {
-        if (typeof window === 'undefined') return { title: '', body: '', eventDate: '', tags: [] }
-
-        const saved = localStorage.getItem(storageKey)
-        if (saved && !entry) {
-            try {
-                return JSON.parse(saved)
-            } catch {
-                return { title: '', body: '', eventDate: '', tags: [] }
-            }
-        }
-
+    // Hydration-safe: start with base values (from entry / defaults), then hydrate drafts in useEffect
+    const base = useMemo(() => {
         return {
             title: entry?.title || '',
             body: entry?.body || '',
             eventDate: entry?.event_date || new Date().toISOString().slice(0, 10),
-            tags: entry?.tags || []
+            tags: (entry?.tags || []) as string[],
         }
-    }
+    }, [entry])
 
-    const initialState = getInitialState()
-    const [title, setTitle] = useState(initialState.title)
-    const [body, setBody] = useState(initialState.body)
-    const [eventDate, setEventDate] = useState(initialState.eventDate)
-    const [tags, setTags] = useState<string[]>(initialState.tags)
+    const baseHash = useMemo(() => hashEntryFields(base), [base])
 
-    // Auto-save to localStorage
+    const [mounted, setMounted] = useState(false)
+    const [title, setTitle] = useState(base.title)
+    const [body, setBody] = useState(base.body)
+    const [eventDate, setEventDate] = useState(base.eventDate)
+    const [tags, setTags] = useState<string[]>(base.tags)
+
+    // Keep form in sync when switching between new/edit or when entry loads
     useEffect(() => {
+        setTitle(base.title)
+        setBody(base.body)
+        setEventDate(base.eventDate)
+        setTags(base.tags)
+    }, [base])
+
+    const draftKeyNew = 'entry-draft-new'
+    const draftKeyEdit = entry ? `entry-edit-draft-${entry.id}` : null
+    const storageKey = entry ? draftKeyEdit! : draftKeyNew
+
+    // Load draft after mount
+    useEffect(() => {
+        setMounted(true)
+
+        const raw = localStorage.getItem(storageKey)
+        if (!raw) return
+
+        let saved: DraftPayload | null = null
+        try {
+            saved = JSON.parse(raw)
+        } catch {
+            return
+        }
+        if (!saved) return
+
+        // New entry: always restore if present
+        if (!entry) {
+            setTitle(saved.title ?? '')
+            setBody(saved.body ?? '')
+            setEventDate(saved.eventDate ?? new Date().toISOString().slice(0, 10))
+            setTags(Array.isArray(saved.tags) ? saved.tags : [])
+            setLastSaved(new Date(saved.updatedAt || Date.now()))
+            return
+        }
+
+        // Edit entry: only restore if it was based on the same DB version
+        if (saved.baseHash && saved.baseHash === baseHash) {
+            const draftFields = {
+                title: saved.title ?? base.title,
+                body: saved.body ?? base.body,
+                eventDate: saved.eventDate ?? base.eventDate,
+                tags: Array.isArray(saved.tags) ? saved.tags : base.tags,
+            }
+            // Only apply if it actually differs from DB values
+            if (hashEntryFields(draftFields) !== baseHash) {
+                setTitle(draftFields.title)
+                setBody(draftFields.body)
+                setEventDate(draftFields.eventDate)
+                setTags(draftFields.tags)
+                setLastSaved(new Date(saved.updatedAt || Date.now()))
+            } else {
+                localStorage.removeItem(storageKey)
+            }
+        } else {
+            // DB changed since draft was made; drop it (or you could keep it)
+            localStorage.removeItem(storageKey)
+        }
+    }, [storageKey, entry, baseHash, base])
+
+    // Derived flags
+    const currentFields = useMemo(
+        () => ({ title, body, eventDate, tags }),
+        [title, body, eventDate, tags]
+    )
+    const currentHash = useMemo(() => hashEntryFields(currentFields), [currentFields])
+
+    const hasUnsavedChanges = entry
+        ? currentHash !== baseHash
+        : (title.trim() || body.trim() || tags.length > 0)
+
+    // Warn on tab close / reload / hard navigation when there are unsaved changes
+    useEffect(() => {
+        if (!mounted || !hasUnsavedChanges) return
+
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            // Required for Chrome/Safari
+            e.preventDefault()
+            e.returnValue = ''
+        }
+
+        window.addEventListener('beforeunload', handleBeforeUnload)
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload)
+        }
+    }, [mounted, hasUnsavedChanges])
+
+    // Auto-save draft (debounced)
+    useEffect(() => {
+        if (!mounted) return
+
+        // For edit: only store when there are unsaved changes
+        // For new: store when non-empty
+        if (!hasUnsavedChanges) {
+            localStorage.removeItem(storageKey)
+            return
+        }
+
         const timer = setTimeout(() => {
-            const draft = { title, body, eventDate, tags }
-            localStorage.setItem(storageKey, JSON.stringify(draft))
-            setLastSaved(new Date())
-        }, 500) // Wait 500ms after last change
+            const payload: DraftPayload = {
+                ...currentFields,
+                updatedAt: Date.now(),
+                ...(entry ? { baseHash } : {}),
+            }
+            localStorage.setItem(storageKey, JSON.stringify(payload))
+            setLastSaved(new Date(payload.updatedAt))
+        }, 500)
 
         return () => clearTimeout(timer)
-    }, [title, body, eventDate, tags, storageKey])
+    }, [mounted, hasUnsavedChanges, currentFields, storageKey, entry, baseHash])
 
-    const clearDraft = () => {
-        localStorage.removeItem(storageKey)
+    const clearDraft = () => localStorage.removeItem(storageKey)
+
+    const resetToBase = () => {
+        setTitle(base.title)
+        setBody(base.body)
+        setEventDate(base.eventDate)
+        setTags(base.tags)
+    }
+
+    const resetToEmpty = () => {
+        setTitle('')
+        setBody('')
+        setEventDate(new Date().toISOString().slice(0, 10))
+        setTags([])
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -72,10 +199,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
         }
 
         if (entry) {
-            const { error } = await supabase
-                .from('entries')
-                .update(entryData)
-                .eq('id', entry.id)
+            const { error } = await supabase.from('entries').update(entryData).eq('id', entry.id)
 
             if (error) {
                 setError(error.message)
@@ -96,14 +220,11 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                 setError(error.message)
                 setLoading(false)
             } else {
-                fetch("/api/embed-entry", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        id: data.id,
-                        body: entryData.body,
-                    }),
-                });
+                fetch('/api/embed-entry', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: data.id, body: entryData.body }),
+                })
 
                 clearDraft()
                 router.push(`/entries/${data.id}`)
@@ -112,21 +233,12 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
         }
     }
 
-    const hasDraft = title || body || tags.length > 0
-
     if (isZenMode) {
-        return (
-            <ZenEditor
-                value={body}
-                onChange={setBody}
-                onExit={() => setIsZenMode(false)}
-            />
-        )
+        return <ZenEditor value={body} onChange={setBody} onExit={() => setIsZenMode(false)} />
     }
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
-
             <div className="mb-6">
                 <input
                     id="title"
@@ -137,30 +249,29 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Untitled"
                     className="
-         entry-title
-    bg-transparent
-    border-none
-    outline-none
-    p-0
-    w-full
-    "
+                        entry-title
+                        bg-transparent
+                        border-none
+                        outline-none
+                        p-0
+                        w-full
+                        "
                 />
             </div>
-
             <div className="flex justify-between">
                 <div>
-                <input
-                    id="event_date"
-                    type="date"
-                    required
-                    value={eventDate}
-                    onChange={(e) => setEventDate(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-500 focus:border-transparent"
-                />
+                    <input
+                        id="event_date"
+                        type="date"
+                        required
+                        value={eventDate}
+                        onChange={(e) => setEventDate(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-500 focus:border-transparent"
+                    />
                 </div>
 
                 <div className="flex items-center">
-                    {hasDraft && lastSaved && (
+                    {mounted && hasUnsavedChanges && lastSaved && (
                         <div className="text-sm mr-2 text-gray-400 dark:text-gray-500">
                             Auto-saved {lastSaved.toLocaleTimeString()}
                         </div>
@@ -179,40 +290,36 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                 />
             </div>
 
-            {error && (
-                <div className="text-red-600 text-sm">{error}</div>
-            )}
+            {error && <div className="text-red-600 text-sm">{error}</div>}
 
             <div className="flex gap-4 justify-end">
-                <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setIsZenMode(true)}
-                    className=""
-                >
+                <Button type="button" variant="ghost" onClick={() => setIsZenMode(true)}>
                     Zen mode
                 </Button>
-                <Button type="submit" variant="secondary" disabled={loading}>
+
+                <Button type="submit" variant="primary" disabled={loading}>
                     {loading ? 'Saving...' : entry ? 'Update' : 'Create'}
                 </Button>
+
                 <Button type="button" variant="secondary" onClick={() => router.back()}>
                     Cancel
                 </Button>
-                {hasDraft && !entry && (
+
+                {mounted && hasUnsavedChanges && (
                     <Button
                         type="button"
                         variant="ghost"
                         onClick={() => {
-                            if (confirm('Are you sure you want to discard this draft?')) {
-                                clearDraft()
-                                setTitle('')
-                                setBody('')
-                                setEventDate(new Date().toISOString().slice(0, 10))
-                                setTags([])
-                            }
+                            const msg = entry
+                                ? 'Discard unsaved changes and revert to the saved entry?'
+                                : 'Discard this draft?'
+                            if (!confirm(msg)) return
+
+                            clearDraft()
+                            entry ? resetToBase() : resetToEmpty()
                         }}
                     >
-                        Discard Draft
+                        {entry ? 'Discard changes' : 'Discard draft'}
                     </Button>
                 )}
             </div>
