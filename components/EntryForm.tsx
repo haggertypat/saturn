@@ -16,18 +16,18 @@ type DraftPayload = {
     baseHash?: string // only for edit drafts
 }
 
-function stableStringify(obj: unknown) {
-    return JSON.stringify(obj, Object.keys(obj as any).sort())
-}
-
-// lightweight “hash” good enough for change detection (not crypto)
-function hashEntryFields(e: { title: string; body: string; eventDate: string; tags: string[] }) {
-    return stableStringify({
-        title: e.title,
-        body: e.body,
-        eventDate: e.eventDate,
-        tags: [...e.tags].sort(),
-    })
+function hashEntryFields(e: {
+    title: string
+    body: string
+    eventDate: string
+    tags: string[]
+}) {
+    return JSON.stringify([
+        e.title,
+        e.body,
+        e.eventDate,
+        [...e.tags].sort(),
+    ])
 }
 
 export default function EntryForm({ entry }: { entry?: Entry }) {
@@ -316,7 +316,11 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                             if (!confirm(msg)) return
 
                             clearDraft()
-                            entry ? resetToBase() : resetToEmpty()
+                            if (entry) {
+                                resetToBase()
+                            } else {
+                                resetToEmpty()
+                            }
                         }}
                     >
                         {entry ? 'Discard changes' : 'Discard draft'}
