@@ -123,7 +123,7 @@ export default function EntryList() {
                     onChange={(e) => setQ(e.target.value)}
                     placeholder="Search entries…"
                     className="flex-1 rounded-md border border-neutral-200 bg-transparent px-3 py-2 text-sm
-                     focus:outline-none focus:ring-2 focus:ring-neutral-400 dark:border-neutral-800
+                     focus:outline-none focus:ring-2 focus:ring-neutral-400 dark:border-neutral-600
                      placeholder:text-gray-400 dark:placeholder:text-neutral-500"
                 />
 

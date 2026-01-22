@@ -62,3 +62,14 @@ input[type="date"] {
     appearance: none;
     padding-right: 0; /* reclaim space */
 }
+
+.prose :where(blockquote p:first-of-type):not(:where([class~="not-prose"], [class~="not-prose"] *)):before {
+    content: "";
+}
+.prose {
+    --tw-prose-quote-borders: var(--color-zinc-300);
+}
+
+.dark .prose {
+    --tw-prose-quote-borders: var(--color-zinc-700);
+}

@@ -43,8 +43,8 @@ export default function ZenEditor({
         h-screen w-screen
         overflow-y-auto
         scrollbar-none
-        bg-white text-gray-900
-        dark:bg-black dark:text-gray-100
+        bg-background text-gray-900
+         dark:text-gray-100
       "
         >
             <div
