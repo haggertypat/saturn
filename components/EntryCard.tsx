@@ -1,13 +1,20 @@
+'use client'
+
 import Link from 'next/link'
 import type { Entry } from '@/lib/types'
 import ReactMarkdown from 'react-markdown'
-import { forwardRef } from 'react';
+import { forwardRef, useState } from 'react';
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 interface EntryCardProps {
     entry: Entry;
 }
 
 const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry }, ref) => {
+    const router = useRouter()
+    const supabase = createClient()
+    const [isDeleting, setIsDeleting] = useState(false)
     const parts = entry.event_date.split('-')
 
     if (parts.length !== 3) {
@@ -35,6 +42,7 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry }, ref) =>
                         onClick={(event) => {
                             event.preventDefault()
                             event.stopPropagation()
+                            router.push(`/entries/${entry.id}/edit`)
                         }}
                     >
                         Edit
@@ -43,12 +51,33 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry }, ref) =>
                         type="button"
                         className="cursor-pointer rounded-md border border-red-200 bg-white px-2 py-1 text-xs font-medium text-red-600 shadow-sm hover:border-red-300 hover:text-red-700 dark:border-red-500/60 dark:bg-neutral-900 dark:text-red-300 dark:hover:border-red-400"
                         aria-label="Delete entry"
+                        disabled={isDeleting}
                         onClick={(event) => {
                             event.preventDefault()
                             event.stopPropagation()
+                            if (isDeleting) return
+                            if (!confirm('Are you sure you want to delete this entry?')) {
+                                return
+                            }
+
+                            setIsDeleting(true)
+                            supabase
+                                .from('entries')
+                                .delete()
+                                .eq('id', entry.id)
+                                .then(({ error }) => {
+                                    if (error) {
+                                        setIsDeleting(false)
+                                        alert('Failed to delete entry')
+                                        return
+                                    }
+
+                                    router.push('/')
+                                    router.refresh()
+                                })
                         }}
                     >
-                        Delete
+                        {isDeleting ? 'Deleting...' : 'Delete'}
                     </button>
                 </div>
                 <Link href={`/entries/${entry.id}`}>
