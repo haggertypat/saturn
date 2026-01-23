@@ -21,6 +21,7 @@ export default function ZenEditor({
         if (!textarea || event.target === textarea) return;
 
         event.preventDefault();
+        event.stopPropagation();
 
         const rect = textarea.getBoundingClientRect();
         const styles = window.getComputedStyle(textarea);
@@ -34,9 +35,15 @@ export default function ZenEditor({
         const clickY = event.clientY;
         const relativeY = clickY - rect.top - paddingTop;
 
-        if (relativeY <= 0) {
+        const focusAndSetSelection = (start: number, end: number) => {
             textarea.focus();
-            textarea.setSelectionRange(0, 0);
+            requestAnimationFrame(() => {
+                textarea.setSelectionRange(start, end);
+            });
+        };
+
+        if (relativeY <= 0) {
+            focusAndSetSelection(0, 0);
             return;
         }
 
@@ -48,8 +55,7 @@ export default function ZenEditor({
         );
 
         if (lineIndex >= lines.length) {
-            textarea.focus();
-            textarea.setSelectionRange(value.length, value.length);
+            focusAndSetSelection(value.length, value.length);
             return;
         }
 
@@ -59,8 +65,7 @@ export default function ZenEditor({
         }
         cursorIndex = Math.min(cursorIndex, value.length);
 
-        textarea.focus();
-        textarea.setSelectionRange(cursorIndex, cursorIndex);
+        focusAndSetSelection(cursorIndex, cursorIndex);
     };
 
     // Auto-grow textarea so the PAGE scrolls, not the textarea
@@ -94,7 +99,7 @@ export default function ZenEditor({
         bg-background text-gray-900
          dark:text-gray-100
       "
-            onMouseDown={moveCursorToClick}
+            onMouseDownCapture={moveCursorToClick}
         >
             <div
                 className="
