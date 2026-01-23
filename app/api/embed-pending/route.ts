@@ -15,7 +15,7 @@ export async function POST() {
         return NextResponse.json({ error: "Missing cron secret" }, { status: 500 });
     }
 
-    const providedSecret = headers().get("x-cron-secret");
+    const providedSecret = (await headers()).get("x-cron-secret");
     if (providedSecret !== expectedSecret) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
