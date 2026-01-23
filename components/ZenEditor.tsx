@@ -62,7 +62,8 @@ export default function ZenEditor({
 
         let cursorIndex = 0;
         for (let i = 0; i < lineIndex; i += 1) {
-            cursorIndex += lines[i].length + 1;
+            const line = lines[i] ?? "";
+            cursorIndex += line.length + 1;
         }
         cursorIndex = Math.min(cursorIndex, value.length);
 
