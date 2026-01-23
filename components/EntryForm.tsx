@@ -235,7 +235,15 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
     }
 
     if (isZenMode) {
-        return <ZenEditor value={body} onChange={setBody} onExit={() => setIsZenMode(false)} />
+        return (
+            <ZenEditor
+                title={title}
+                onTitleChange={setTitle}
+                value={body}
+                onChange={setBody}
+                onExit={() => setIsZenMode(false)}
+            />
+        )
     }
 
     return (
