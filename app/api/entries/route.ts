@@ -5,6 +5,13 @@ const LIMIT = 10;
 
 export async function GET(req: Request) {
     const supabase = await createServerSupabaseClient();
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const url = new URL(req.url);
     const cursor = url.searchParams.get("cursor"); // encoded JSON string
