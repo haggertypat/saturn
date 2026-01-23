@@ -10,6 +10,7 @@ import {Button} from "@/components/Button";
 import { fetchTopMatches } from "@/lib/entries";
 import EntryCard from "@/components/EntryCard";
 import {EntryWithSimilarity} from "@/lib/entries";
+import {PencilIcon} from '@heroicons/react/24/outline'
 
 function EmbeddingBadge({ status }: { status: string }) {
     const map: Record<string, string> = {
@@ -196,12 +197,24 @@ export default function EntryView({ entry }: { entry: Entry }) {
     return (
 
         <article className="">
-            <div className=" mb-2">
+            <div className="mb-2">
                 <div>
-                    <h1 className="entry-title">
-                        {entry.title}
-                    </h1>
-
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="entry-title">
+                                {entry.title}
+                            </h1>
+                        </div>
+                        <div className="text-sm">
+                            <Button
+                                href={`/entries/${entry.id}/edit`}
+                                variant="secondary"
+                                className="inline-flex items-center gap-1"
+                            >
+                                <PencilIcon className="h-4 w-4" /> Edit
+                            </Button>
+                        </div>
+                    </div>
 
                     <time className="text-sm">
                         {eventDate.toLocaleDateString('en-US', {
@@ -224,8 +237,9 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 <Button
                     href={`/entries/${entry.id}/edit`}
                     variant="secondary"
+                    className="inline-flex items-center gap-1"
                 >
-                    Edit
+                    <PencilIcon className="h-5 w-5" /> Edit
                 </Button>
                 <Button
                     onClick={handleDelete}
