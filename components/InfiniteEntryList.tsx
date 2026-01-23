@@ -22,6 +22,7 @@ type EntriesResponse = {
 export default function EntryList() {
     const [entries, setEntries] = useState<Entry[]>([])
     const [loading, setLoading] = useState(false)
+    const [hasFetched, setHasFetched] = useState(false)
     const [hasMore, setHasMore] = useState(true)
 
     const [q, setQ] = useState('')
@@ -73,6 +74,7 @@ export default function EntryList() {
             } finally {
                 isFetchingRef.current = false
                 setLoading(false)
+                setHasFetched(true)
             }
         },
         []
@@ -85,6 +87,7 @@ export default function EntryList() {
         setEntries([])
         nextCursorRef.current = null
         setHasMore(true)
+        setHasFetched(false)
 
         if (observerRef.current) observerRef.current.disconnect()
 
@@ -153,7 +156,7 @@ export default function EntryList() {
                     <div key={i} className="h-20 animate-pulse rounded-md bg-gray-100 p-4 dark:bg-neutral-900" />
                 ))}
 
-            {!loading && entries.length === 0 && (
+            {!loading && hasFetched && entries.length === 0 && (
                 <p className="text-center text-gray-400">
                     {debouncedQ.trim() ? 'No results' : 'No entries'}
                 </p>
