@@ -20,6 +20,8 @@ export default function ZenEditor({
         const textarea = textareaRef.current;
         if (!textarea || event.target === textarea) return;
 
+        event.preventDefault();
+
         const rect = textarea.getBoundingClientRect();
         const styles = window.getComputedStyle(textarea);
         const lineHeightValue = parseFloat(styles.lineHeight);
