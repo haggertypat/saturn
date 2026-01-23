@@ -4,12 +4,16 @@ import type { MouseEvent } from "react";
 import { useEffect, useRef } from "react";
 
 type ZenEditorProps = {
+    title: string;
+    onTitleChange: (value: string) => void;
     value: string;
     onChange: (value: string) => void;
     onExit: () => void;
 };
 
 export default function ZenEditor({
+                                      title,
+                                      onTitleChange,
                                       value,
                                       onChange,
                                       onExit,
@@ -19,6 +23,12 @@ export default function ZenEditor({
     const moveCursorToClick = (event: MouseEvent<HTMLDivElement>) => {
         const textarea = textareaRef.current;
         if (!textarea || event.target === textarea) return;
+        if (
+            event.target instanceof HTMLElement &&
+            event.target.closest('[data-zen-ignore="true"]')
+        ) {
+            return;
+        }
 
         event.preventDefault();
         event.stopPropagation();
@@ -112,15 +122,36 @@ export default function ZenEditor({
           prose prose-neutral dark:prose-invert
         "
             >
-        <textarea
-            ref={textareaRef}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            spellCheck={false}
-            autoCorrect="off"
-            autoCapitalize="off"
-            autoComplete="off"
-            className="
+                <div className="mb-6" data-zen-ignore="true">
+                    <input
+                        id="title"
+                        type="text"
+                        required
+                        maxLength={250}
+                        value={title}
+                        onChange={(e) => onTitleChange(e.target.value)}
+                        placeholder="Untitled"
+                        className="
+                        entry-title
+                        bg-transparent
+                        border-none
+                        outline-none
+                        p-0
+                        w-full
+                        text-neutral-900 dark:text-neutral-100
+                        placeholder:text-gray-400 dark:placeholder:text-neutral-500
+                        "
+                    />
+                </div>
+                <textarea
+                    ref={textareaRef}
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    spellCheck={false}
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    autoComplete="off"
+                    className="
             block w-full
             resize-none
             bg-transparent
@@ -131,7 +162,7 @@ export default function ZenEditor({
             leading-inherit
             whitespace-pre-wrap
           "
-        />
+                />
             </div>
         </div>
     );
