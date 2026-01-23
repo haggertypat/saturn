@@ -19,6 +19,7 @@
     --bg: #fdfdfc;
     --fg: #1a1a1a;
     --brd: #e5e5e4;
+    --font-serif: "Source Serif 4", serif;
 }
 
 /* 2. Define the Dark variables - Use both selectors to be safe */
@@ -34,6 +35,7 @@
     html, body {
         background-color: var(--bg) !important;
         color: var(--fg) !important;
+        font-family: var(--font-serif);
         @apply antialiased transition-colors duration-300;
     }
 }

@@ -1,12 +1,5 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { Source_Serif_4 } from 'next/font/google'
-
-const sourceSerif = Source_Serif_4({
-    subsets: ['latin'],
-    style: ['normal', 'italic'],
-    variable: '--font-source-serif', // This creates the CSS variable
-})
 
 export const metadata: Metadata = {
     title: 'Saturn',
@@ -31,8 +24,12 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <html lang="en" className={`${sourceSerif.variable} font-serif`} suppressHydrationWarning>
+        <html lang="en" className="font-serif" suppressHydrationWarning>
         <head>
+            <link
+                rel="stylesheet"
+                href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,200..900;1,200..900&display=swap"
+            />
             <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         </head>
         <body className="antialiased">
