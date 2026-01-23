@@ -1,5 +1,6 @@
 // app/api/embed-pending/route.ts
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import { tryEmbedEntry } from "@/app/actions/entries";
 
@@ -9,6 +10,16 @@ const supabase = createClient(
 );
 
 export async function POST() {
+    const expectedSecret = process.env.EMBED_CRON_SECRET;
+    if (!expectedSecret) {
+        return NextResponse.json({ error: "Missing cron secret" }, { status: 500 });
+    }
+
+    const providedSecret = (await headers()).get("x-cron-secret");
+    if (providedSecret !== expectedSecret) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { data: entries } = await supabase
         .from("entries")
         .select("id, body")
