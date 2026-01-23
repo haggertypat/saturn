@@ -9,9 +9,10 @@ import { createClient } from '@/lib/supabase/client'
 
 interface EntryCardProps {
     entry: Entry;
+    onDelete?: (id: string) => void;
 }
 
-const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry }, ref) => {
+const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete }, ref) => {
     const router = useRouter()
     const supabase = createClient()
     const [isDeleting, setIsDeleting] = useState(false)
@@ -72,8 +73,11 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry }, ref) =>
                                         return
                                     }
 
-                                    router.push('/')
-                                    router.refresh()
+                                    onDelete?.(entry.id)
+                                    if (!onDelete) {
+                                        router.push('/')
+                                        router.refresh()
+                                    }
                                 })
                         }}
                     >

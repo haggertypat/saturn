@@ -114,7 +114,11 @@ export function RelatedEntries({ entryId }: { entryId: string }) {
             <h2 className="text-lg font-bold mb-2">Similar Entries</h2>
             <div>
                 {matches.map((m) => (
-                    <EntryCard key={m.id} entry={m} />
+                    <EntryCard
+                        key={m.id}
+                        entry={m}
+                        onDelete={(id) => setMatches((prev) => prev.filter((item) => item.id !== id))}
+                    />
                 ))}
             </div>
         </section>

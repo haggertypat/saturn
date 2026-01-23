@@ -147,6 +147,10 @@ export default function EntryList() {
                         key={entry.id}
                         ref={shouldObserveLast ? lastEntryRef : null}
                         entry={entry}
+                        onDelete={(id) => {
+                            entriesRef.current = entriesRef.current.filter((item) => item.id !== id)
+                            setEntries(entriesRef.current)
+                        }}
                     />
                 )
             })}
