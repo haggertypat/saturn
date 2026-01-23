@@ -237,13 +237,13 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 </ReactMarkdown>
             </div>
 
-            <div className="flex justify-end gap-4 pt-6 mt-6 border-t border-gray-200">
+            <div className="flex justify-end text-sm gap-4 pt-6 mt-6 border-t border-gray-200">
                 <Button
                     href={`/entries/${entry.id}/edit`}
                     variant="secondary"
                     className="inline-flex items-center gap-1"
                 >
-                    <PencilIcon className="h-5 w-5" /> Edit
+                    <PencilIcon className="h-4 w-4" /> Edit
                 </Button>
                 <Button
                     onClick={handleDelete}
