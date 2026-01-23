@@ -53,8 +53,9 @@ export default function ZenEditor({
             maxLineIndex,
             Math.floor(relativeY / lineHeight),
         );
+        const contentHeight = lines.length * lineHeight;
 
-        if (lineIndex >= lines.length) {
+        if (relativeY >= contentHeight || lineIndex >= lines.length) {
             focusAndSetSelection(value.length, value.length);
             return;
         }
