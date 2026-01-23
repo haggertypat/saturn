@@ -5,7 +5,7 @@ import type { Entry } from '@/lib/types'
 import EntryCard from './EntryCard'
 
 export default function EntryList({ initialEntries }: { initialEntries: Entry[] }) {
-    const [entries] = useState<Entry[]>(initialEntries)
+    const [entries, setEntries] = useState<Entry[]>(initialEntries)
 
     return (
         <div className="space-y-6">
@@ -17,7 +17,11 @@ export default function EntryList({ initialEntries }: { initialEntries: Entry[] 
             ) : (
                 <div className="space-y-4">
                     {entries.map((entry) => (
-                        <EntryCard key={entry.id} entry={entry} />
+                        <EntryCard
+                            key={entry.id}
+                            entry={entry}
+                            onDelete={(id) => setEntries((prev) => prev.filter((item) => item.id !== id))}
+                        />
                     ))}
                 </div>
             )}
