@@ -1,7 +1,7 @@
 // components/Button.tsx
 import { ButtonHTMLAttributes, AnchorHTMLAttributes } from "react";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "secondary" | "ghost" | "danger";
 
 type ButtonProps = {
     variant?: Variant;
@@ -26,7 +26,11 @@ export function Button({
             "cursor-pointer border border-neutral-300 dark:border-neutral-600 text-neutral-900 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 px-4 py-2 rounded",
         ghost:
             "cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 px-4 py-2 rounded",
+        danger:
+            "cursor-pointer border border-red-200 bg-white text-red-600 hover:border-red-300 hover:text-red-700 dark:border-red-500/60 dark:bg-neutral-900 dark:text-red-300 dark:hover:border-red-400 px-4 py-2 rounded",
     };
+
+
 
     const classes = `${styles[variant]} ${className}`;
 

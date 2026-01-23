@@ -248,7 +248,7 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 <Button
                     onClick={handleDelete}
                     disabled={deleting}
-                    variant="secondary"
+                    variant="danger"
                 >
                     {deleting ? 'Deleting...' : 'Delete'}
                 </Button>
