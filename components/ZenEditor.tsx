@@ -20,10 +20,7 @@ export default function ZenEditor({
                                   }: ZenEditorProps) {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-    const scrollPositionRef = useRef<{
-        top: number;
-        wasNearBottom: boolean;
-    } | null>(null);
+    const scrollPositionRef = useRef<number | null>(null);
 
     const moveCursorToClick = (event: MouseEvent<HTMLDivElement>) => {
         const textarea = textareaRef.current;
@@ -94,8 +91,8 @@ export default function ZenEditor({
 
         const container = scrollContainerRef.current;
         const snapshot = scrollPositionRef.current;
-        if (container && snapshot && !snapshot.wasNearBottom) {
-            container.scrollTop = snapshot.top;
+        if (container !== null && snapshot !== null) {
+            container.scrollTop = snapshot;
         }
     }, [value]);
 
@@ -118,12 +115,7 @@ export default function ZenEditor({
     const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         const container = scrollContainerRef.current;
         if (container) {
-            const maxScrollTop = container.scrollHeight - container.clientHeight;
-            const wasNearBottom = maxScrollTop - container.scrollTop < 4;
-            scrollPositionRef.current = {
-                top: container.scrollTop,
-                wasNearBottom,
-            };
+            scrollPositionRef.current = container.scrollTop;
         }
         onChange(event.target.value);
     };
