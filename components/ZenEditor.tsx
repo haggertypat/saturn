@@ -1,7 +1,7 @@
 "use client";
 
-import type { MouseEvent } from "react";
-import { useEffect, useRef } from "react";
+import type { ChangeEvent, MouseEvent } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 type ZenEditorProps = {
     title: string;
@@ -19,6 +19,11 @@ export default function ZenEditor({
                                       onExit,
                                   }: ZenEditorProps) {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+    const scrollPositionRef = useRef<{
+        top: number;
+        wasNearBottom: boolean;
+    } | null>(null);
 
     const moveCursorToClick = (event: MouseEvent<HTMLDivElement>) => {
         const textarea = textareaRef.current;
@@ -81,13 +86,22 @@ export default function ZenEditor({
     };
 
     // Auto-grow textarea so the PAGE scrolls, not the textarea
-    useEffect(() => {
+    useLayoutEffect(() => {
         const el = textareaRef.current;
         if (!el) return;
         el.style.height = "auto";
         el.style.height = `${el.scrollHeight}px`;
-        textareaRef.current?.focus();
+
+        const container = scrollContainerRef.current;
+        const snapshot = scrollPositionRef.current;
+        if (container && snapshot && !snapshot.wasNearBottom) {
+            container.scrollTop = snapshot.top;
+        }
     }, [value]);
+
+    useEffect(() => {
+        textareaRef.current?.focus();
+    }, []);
 
     // ESC to exit zen mode
     useEffect(() => {
@@ -101,8 +115,22 @@ export default function ZenEditor({
         return () => window.removeEventListener("keydown", handler);
     }, [onExit]);
 
+    const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+        const container = scrollContainerRef.current;
+        if (container) {
+            const maxScrollTop = container.scrollHeight - container.clientHeight;
+            const wasNearBottom = maxScrollTop - container.scrollTop < 4;
+            scrollPositionRef.current = {
+                top: container.scrollTop,
+                wasNearBottom,
+            };
+        }
+        onChange(event.target.value);
+    };
+
     return (
         <div
+            ref={scrollContainerRef}
             className="
         fixed inset-0 z-50
         h-screen w-screen
@@ -119,6 +147,7 @@ export default function ZenEditor({
           max-w-[42rem]
           px-6
           py-24
+          pb-[70vh]
           prose prose-neutral dark:prose-invert
         "
             >
@@ -146,7 +175,7 @@ export default function ZenEditor({
                 <textarea
                     ref={textareaRef}
                     value={value}
-                    onChange={(e) => onChange(e.target.value)}
+                    onChange={handleChange}
                     spellCheck={false}
                     autoCorrect="off"
                     autoCapitalize="off"
