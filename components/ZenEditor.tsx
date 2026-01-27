@@ -112,10 +112,16 @@ export default function ZenEditor({
         return () => window.removeEventListener("keydown", handler);
     }, [onExit]);
 
-    const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    const snapshotScrollPosition = () => {
         const container = scrollContainerRef.current;
         if (container) {
             scrollPositionRef.current = container.scrollTop;
+        }
+    };
+
+    const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+        if (scrollPositionRef.current === null) {
+            snapshotScrollPosition();
         }
         onChange(event.target.value);
     };
@@ -168,6 +174,7 @@ export default function ZenEditor({
                     ref={textareaRef}
                     value={value}
                     onChange={handleChange}
+                    onBeforeInput={snapshotScrollPosition}
                     spellCheck={false}
                     autoCorrect="off"
                     autoCapitalize="off"
