@@ -37,6 +37,10 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete 
         <div ref={ref}> {/* observer attached here */}
             <div className="group relative">
                 <div className="absolute right-3 bottom-3 z-10 flex gap-2 opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 group-hover:pointer-events-auto">
+                    <StarredBadge
+                        entryId={entry.id}
+                        initialStarred={entry.starred}
+                    />
                     <button
                         type="button"
                         className="cursor-pointer rounded-md border border-neutral-200 bg-white px-2 py-1 text-xs font-medium text-neutral-700 shadow-sm hover:border-neutral-300 hover:text-neutral-900 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:border-neutral-500"
@@ -107,10 +111,12 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete 
                                     </p>
                                 )}
 
-                                <StarredBadge
-                                    entryId={entry.id}
-                                    initialStarred={entry.starred}
-                                />
+                                {entry.starred && (
+                                    <StarredBadge
+                                        entryId={entry.id}
+                                        initialStarred={entry.starred}
+                                    />
+                                )}
 
                             </div>
                         </div>
