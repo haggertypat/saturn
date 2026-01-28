@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import { forwardRef, useState } from 'react';
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import StarredBadge from '@/components/StarredBadge'
 
 interface EntryCardProps {
     entry: Entry;
@@ -50,7 +51,7 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete 
                     </button>
                     <button
                         type="button"
-                        className="cursor-pointer rounded-md border border-red-200 bg-white px-2 py-1 text-xs font-medium text-red-600 shadow-sm hover:border-red-300 hover:text-red-700 dark:border-red-500/60 dark:bg-neutral-900 dark:text-red-300 dark:hover:border-red-400"
+                        className="cursor-pointer rounded-md border border-neutral-200 bg-white px-2 py-1 text-xs font-medium text-neutral-700 shadow-sm hover:border-neutral-300 hover:text-neutral-900 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:border-neutral-500"
                         aria-label="Delete entry"
                         disabled={isDeleting}
                         onClick={(event) => {
@@ -88,14 +89,30 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete 
                     <article className="border border-neutral-200 dark:border-neutral-600 rounded-md
                         p-6 mb-1.5 hover:border-neutral-400 dark:hover:border-neutral-400 transition-colors cursor-pointer">
                         <div className="flex justify-between items-start mb-2">
-                            <h3 className="text-lg font-medium ">{entry.title}</h3>
-                            <time className="text-sm">
-                                {eventDate.toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric'
-                                })}
-                            </time>
+                            <div className="space-y-1">
+                                <h3 className="text-lg font-medium ">{entry.title ?? 'Untitled'}</h3>
+                            </div>
+                            <div className="flex gap-3 items-center text-sm">
+                                <time>
+                                    {eventDate.toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric'
+                                    })}
+                                </time>
+
+                                {entry.category && (
+                                    <p className="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                                        {entry.category}
+                                    </p>
+                                )}
+
+                                <StarredBadge
+                                    entryId={entry.id}
+                                    initialStarred={entry.starred}
+                                />
+
+                            </div>
                         </div>
 
                         <div className="prose prose-sm dark:prose-invert max-w-none">

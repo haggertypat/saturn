@@ -11,12 +11,13 @@ import { fetchTopMatches } from "@/lib/entries";
 import EntryCard from "@/components/EntryCard";
 import {EntryWithSimilarity} from "@/lib/entries";
 import {PencilIcon} from '@heroicons/react/24/outline'
+import StarredBadge from '@/components/StarredBadge'
 
 function EmbeddingBadge({ status }: { status: string }) {
     const map: Record<string, string> = {
-        complete: "bg-green-100 text-green-800",
-        pending: "bg-yellow-100 text-yellow-800",
-        failed: "bg-red-100 text-red-800",
+        complete: "bg-neutral-100 text-neutral-800",
+        pending: "bg-neutral-100 text-neutral-800",
+        failed: "bg-neutral-100 text-neutral-800",
     };
 
     return (
@@ -206,10 +207,19 @@ export default function EntryView({ entry }: { entry: Entry }) {
                     <div className="flex justify-between items-center">
                         <div>
                             <h1 className="entry-title">
-                                {entry.title}
+                                {entry.title ?? 'Untitled'}
                             </h1>
+                            {entry.category && (
+                                <p className="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                                    {entry.category}
+                                </p>
+                            )}
                         </div>
-                        <div className="text-sm">
+                        <div className="flex items-center gap-2 text-sm">
+                            <StarredBadge
+                                entryId={entry.id}
+                                initialStarred={entry.starred}
+                            />
                             <Button
                                 href={`/entries/${entry.id}/edit`}
                                 variant="secondary"
@@ -248,7 +258,7 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 <Button
                     onClick={handleDelete}
                     disabled={deleting}
-                    variant="danger"
+                    variant="secondary"
                 >
                     {deleting ? 'Deleting...' : 'Delete'}
                 </Button>

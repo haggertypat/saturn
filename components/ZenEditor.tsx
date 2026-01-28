@@ -153,7 +153,6 @@ export default function ZenEditor({
                     <input
                         id="title"
                         type="text"
-                        required
                         maxLength={250}
                         value={title}
                         onChange={(e) => onTitleChange(e.target.value)}
