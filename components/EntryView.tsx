@@ -15,9 +15,9 @@ import StarredBadge from '@/components/StarredBadge'
 
 function EmbeddingBadge({ status }: { status: string }) {
     const map: Record<string, string> = {
-        complete: "bg-green-100 text-green-800",
-        pending: "bg-yellow-100 text-yellow-800",
-        failed: "bg-red-100 text-red-800",
+        complete: "bg-neutral-100 text-neutral-800",
+        pending: "bg-neutral-100 text-neutral-800",
+        failed: "bg-neutral-100 text-neutral-800",
     };
 
     return (
@@ -258,7 +258,7 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 <Button
                     onClick={handleDelete}
                     disabled={deleting}
-                    variant="danger"
+                    variant="secondary"
                 >
                     {deleting ? 'Deleting...' : 'Delete'}
                 </Button>

@@ -51,7 +51,7 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete 
                     </button>
                     <button
                         type="button"
-                        className="cursor-pointer rounded-md border border-red-200 bg-white px-2 py-1 text-xs font-medium text-red-600 shadow-sm hover:border-red-300 hover:text-red-700 dark:border-red-500/60 dark:bg-neutral-900 dark:text-red-300 dark:hover:border-red-400"
+                        className="cursor-pointer rounded-md border border-neutral-200 bg-white px-2 py-1 text-xs font-medium text-neutral-700 shadow-sm hover:border-neutral-300 hover:text-neutral-900 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:border-neutral-500"
                         aria-label="Delete entry"
                         disabled={isDeleting}
                         onClick={(event) => {
@@ -91,13 +91,8 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete 
                         <div className="flex justify-between items-start mb-2">
                             <div className="space-y-1">
                                 <h3 className="text-lg font-medium ">{entry.title ?? 'Untitled'}</h3>
-                                {entry.category && (
-                                    <p className="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
-                                        {entry.category}
-                                    </p>
-                                )}
                             </div>
-                            <div className="flex flex-col items-end gap-2 text-sm">
+                            <div className="flex gap-3 items-center text-sm">
                                 <time>
                                     {eventDate.toLocaleDateString('en-US', {
                                         year: 'numeric',
@@ -105,10 +100,18 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete 
                                         day: 'numeric'
                                     })}
                                 </time>
+
+                                {entry.category && (
+                                    <p className="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                                        {entry.category}
+                                    </p>
+                                )}
+
                                 <StarredBadge
                                     entryId={entry.id}
                                     initialStarred={entry.starred}
                                 />
+
                             </div>
                         </div>
 
