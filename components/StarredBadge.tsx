@@ -103,9 +103,9 @@ export default function StarredBadge({
             className="cursor-pointer"
         >
             {starred ? (
-                <StarSolidIcon className="h-4 w-4" />
+                <StarSolidIcon className="h-5 w-5" />
             ) : (
-                <StarOutlineIcon className="h-4 w-4" />
+                <StarOutlineIcon className="h-5 w-5" />
             )}
         </button>
     )

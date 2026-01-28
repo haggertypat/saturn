@@ -10,7 +10,7 @@ import {Button} from "@/components/Button";
 import { fetchTopMatches } from "@/lib/entries";
 import EntryCard from "@/components/EntryCard";
 import {EntryWithSimilarity} from "@/lib/entries";
-import {PencilIcon} from '@heroicons/react/24/outline'
+import {PencilIcon, AdjustmentsHorizontalIcon} from '@heroicons/react/24/outline'
 import StarredBadge from '@/components/StarredBadge'
 
 function EmbeddingBadge({ status }: { status: string }) {
@@ -131,6 +131,7 @@ export default function EntryView({ entry }: { entry: Entry }) {
     const router = useRouter()
     const supabase = createClient()
     const [deleting, setDeleting] = useState(false)
+    const [settingsVisible, setSettingsVisible] = useState(false);
 
     const parts = entry.event_date.split('-')
 
@@ -244,11 +245,6 @@ export default function EntryView({ entry }: { entry: Entry }) {
             </div>
 
             <div className="flex justify-end text-sm gap-4 pt-6 mt-6 border-t border-gray-200">
-                <StarredBadge
-                    entryId={entry.id}
-                    initialStarred={entry.starred}
-                />
-
                 <Button
                     href={`/entries/${entry.id}/edit`}
                     variant="secondary"
@@ -265,8 +261,18 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 </Button>
             </div>
 
-            <div className="flex justify-end mt-6">
-                <EmbedControls entryId={currentEntry.id} body={currentEntry.body} status={currentEntry.embedding_status}></EmbedControls>
+            <div className="flex items-center justify-end mt-6 gap-4">
+                { settingsVisible && (
+                    <EmbedControls entryId={currentEntry.id} body={currentEntry.body} status={currentEntry.embedding_status}></EmbedControls>
+                )}
+                <AdjustmentsHorizontalIcon
+                    className="h-5 w-5 cursor-pointer"
+                    onClick={() => setSettingsVisible(v => !v)} />
+                <StarredBadge
+                    entryId={entry.id}
+                    initialStarred={entry.starred}
+                />
+
             </div>
 
             {currentEntry.embedding_status === "complete" &&
