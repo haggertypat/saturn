@@ -1,7 +1,7 @@
 'use client'
 
 import type { MouseEvent } from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { StarIcon as StarOutlineIcon } from '@heroicons/react/24/outline'
 import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid'
 import { createClient } from '@/lib/supabase/client'
@@ -46,31 +46,29 @@ const subscribeToStarred = (entryId: string, listener: (value: boolean) => void)
     }
 }
 
+const useStarredValue = (entryId: string, initialStarred: boolean) => {
+    return useSyncExternalStore(
+        (listener) => subscribeToStarred(entryId, () => listener()),
+        () => getStarredValue(entryId, initialStarred),
+        () => getStarredValue(entryId, initialStarred),
+    )
+}
+
 export default function StarredBadge({
     entryId,
     initialStarred,
     onChange,
 }: StarredBadgeProps) {
     const supabase = createClient()
-    const [starred, setStarred] = useState(() =>
-        getStarredValue(entryId, initialStarred),
-    )
+    const starred = useStarredValue(entryId, initialStarred)
     const [isSaving, setIsSaving] = useState(false)
 
     useEffect(() => {
         const currentValue = getStarredValue(entryId, initialStarred)
         if (currentValue !== initialStarred) {
             setStarredValue(entryId, initialStarred)
-        } else {
-            setStarred(currentValue)
         }
     }, [entryId, initialStarred])
-
-    useEffect(() => {
-        return subscribeToStarred(entryId, (nextValue) => {
-            setStarred(nextValue)
-        })
-    }, [entryId])
 
     const toggleStar = async (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault()
