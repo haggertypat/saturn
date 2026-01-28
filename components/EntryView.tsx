@@ -208,6 +208,11 @@ export default function EntryView({ entry }: { entry: Entry }) {
                             <h1 className="entry-title">
                                 {entry.title ?? 'Untitled'}
                             </h1>
+                            {entry.category && (
+                                <p className="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                                    {entry.category}
+                                </p>
+                            )}
                         </div>
                         <div className="text-sm">
                             <Button

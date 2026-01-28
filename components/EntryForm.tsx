@@ -13,6 +13,7 @@ type DraftPayload = {
     body: string
     eventDate: string
     tags: string[]
+    category: Entry['category']
     updatedAt: number
     baseHash?: string // only for edit drafts
 }
@@ -22,12 +23,14 @@ function hashEntryFields(e: {
     body: string
     eventDate: string
     tags: string[]
+    category: Entry['category']
 }) {
     return JSON.stringify([
         e.title,
         e.body,
         e.eventDate,
         [...e.tags].sort(),
+        e.category,
     ])
 }
 
@@ -47,6 +50,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
             body: entry?.body || '',
             eventDate: entry?.event_date || new Date().toISOString().slice(0, 10),
             tags: (entry?.tags || []) as string[],
+            category: entry?.category ?? null,
         }
     }, [entry])
 
@@ -57,6 +61,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
     const [body, setBody] = useState(base.body)
     const [eventDate, setEventDate] = useState(base.eventDate)
     const [tags, setTags] = useState<string[]>(base.tags)
+    const [category, setCategory] = useState<Entry['category']>(base.category)
 
     // Keep form in sync when switching between new/edit or when entry loads
     useEffect(() => {
@@ -64,6 +69,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
         setBody(base.body)
         setEventDate(base.eventDate)
         setTags(base.tags)
+        setCategory(base.category)
     }, [base])
 
     const draftKeyNew = 'entry-draft-new'
@@ -91,6 +97,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
             setBody(saved.body ?? '')
             setEventDate(saved.eventDate ?? new Date().toISOString().slice(0, 10))
             setTags(Array.isArray(saved.tags) ? saved.tags : [])
+            setCategory(saved.category ?? null)
             setLastSaved(new Date(saved.updatedAt || Date.now()))
             return
         }
@@ -102,6 +109,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                 body: saved.body ?? base.body,
                 eventDate: saved.eventDate ?? base.eventDate,
                 tags: Array.isArray(saved.tags) ? saved.tags : base.tags,
+                category: saved.category ?? base.category,
             }
             // Only apply if it actually differs from DB values
             if (hashEntryFields(draftFields) !== baseHash) {
@@ -109,6 +117,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                 setBody(draftFields.body)
                 setEventDate(draftFields.eventDate)
                 setTags(draftFields.tags)
+                setCategory(draftFields.category)
                 setLastSaved(new Date(saved.updatedAt || Date.now()))
             } else {
                 localStorage.removeItem(storageKey)
@@ -121,8 +130,8 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
 
     // Derived flags
     const currentFields = useMemo(
-        () => ({ title, body, eventDate, tags }),
-        [title, body, eventDate, tags]
+        () => ({ title, body, eventDate, tags, category }),
+        [title, body, eventDate, tags, category]
     )
     const currentHash = useMemo(() => hashEntryFields(currentFields), [currentFields])
 
@@ -178,6 +187,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
         setBody(base.body)
         setEventDate(base.eventDate)
         setTags(base.tags)
+        setCategory(base.category)
     }
 
     const resetToEmpty = () => {
@@ -185,6 +195,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
         setBody('')
         setEventDate(new Date().toISOString().slice(0, 10))
         setTags([])
+        setCategory(null)
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -197,6 +208,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
             body,
             event_date: new Date(eventDate).toISOString(),
             tags,
+            category,
         }
 
         if (entry) {
@@ -278,6 +290,30 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                         onChange={(e) => setEventDate(e.target.value)}
                         className="pl-3 pr-0 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-500 focus:border-transparent"
                     />
+                </div>
+                <div>
+                    <label className="sr-only" htmlFor="category">
+                        Category
+                    </label>
+                    <select
+                        id="category"
+                        value={category ?? ''}
+                        onChange={(e) =>
+                            setCategory(
+                                (e.target.value || null) as Entry['category']
+                            )
+                        }
+                        className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-neutral-500 focus:border-transparent"
+                    >
+                        <option value="">Uncategorized</option>
+                        <option value="dream">Dream</option>
+                        <option value="journal">Journal</option>
+                        <option value="trip report">Trip report</option>
+                        <option value="outing">Outing</option>
+                        <option value="essay">Essay</option>
+                        <option value="note">Note</option>
+                        <option value="other">Other</option>
+                    </select>
                 </div>
                 <div>
                     <Button type="button" variant="ghost" onClick={() => setIsZenMode(true)}>

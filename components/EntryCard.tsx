@@ -88,7 +88,14 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete 
                     <article className="border border-neutral-200 dark:border-neutral-600 rounded-md
                         p-6 mb-1.5 hover:border-neutral-400 dark:hover:border-neutral-400 transition-colors cursor-pointer">
                         <div className="flex justify-between items-start mb-2">
-                            <h3 className="text-lg font-medium ">{entry.title ?? 'Untitled'}</h3>
+                            <div className="space-y-1">
+                                <h3 className="text-lg font-medium ">{entry.title ?? 'Untitled'}</h3>
+                                {entry.category && (
+                                    <p className="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                                        {entry.category}
+                                    </p>
+                                )}
+                            </div>
                             <time className="text-sm">
                                 {eventDate.toLocaleDateString('en-US', {
                                     year: 'numeric',
