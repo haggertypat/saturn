@@ -13,18 +13,64 @@ type StarredBadgeProps = {
     onChange?: (starred: boolean) => void
 }
 
+const starredState = new Map<string, boolean>()
+const starredListeners = new Map<string, Set<(value: boolean) => void>>()
+
+const getStarredValue = (entryId: string, fallback: boolean) => {
+    if (!starredState.has(entryId)) {
+        starredState.set(entryId, fallback)
+    }
+
+    return starredState.get(entryId) ?? fallback
+}
+
+const setStarredValue = (entryId: string, value: boolean) => {
+    starredState.set(entryId, value)
+    starredListeners.get(entryId)?.forEach((listener) => listener(value))
+}
+
+const subscribeToStarred = (entryId: string, listener: (value: boolean) => void) => {
+    let listeners = starredListeners.get(entryId)
+    if (!listeners) {
+        listeners = new Set()
+        starredListeners.set(entryId, listeners)
+    }
+
+    listeners.add(listener)
+
+    return () => {
+        listeners?.delete(listener)
+        if (listeners && listeners.size === 0) {
+            starredListeners.delete(entryId)
+        }
+    }
+}
+
 export default function StarredBadge({
     entryId,
     initialStarred,
     onChange,
 }: StarredBadgeProps) {
     const supabase = createClient()
-    const [starred, setStarred] = useState(initialStarred)
+    const [starred, setStarred] = useState(() =>
+        getStarredValue(entryId, initialStarred),
+    )
     const [isSaving, setIsSaving] = useState(false)
 
     useEffect(() => {
-        setStarred(initialStarred)
-    }, [initialStarred])
+        const currentValue = getStarredValue(entryId, initialStarred)
+        if (currentValue !== initialStarred) {
+            setStarredValue(entryId, initialStarred)
+        } else {
+            setStarred(currentValue)
+        }
+    }, [entryId, initialStarred])
+
+    useEffect(() => {
+        return subscribeToStarred(entryId, (nextValue) => {
+            setStarred(nextValue)
+        })
+    }, [entryId])
 
     const toggleStar = async (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault()
@@ -33,7 +79,7 @@ export default function StarredBadge({
         if (isSaving) return
 
         const nextValue = !starred
-        setStarred(nextValue)
+        setStarredValue(entryId, nextValue)
         setIsSaving(true)
 
         const { error } = await supabase
@@ -42,7 +88,7 @@ export default function StarredBadge({
             .eq('id', entryId)
 
         if (error) {
-            setStarred(!nextValue)
+            setStarredValue(entryId, !nextValue)
             alert('Failed to update starred')
         } else {
             onChange?.(nextValue)
