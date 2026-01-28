@@ -1,6 +1,6 @@
 export interface Entry {
     id: string
-    title: string
+    title: string | null
     body: string
     event_date: string
     created_at: string
@@ -8,7 +8,18 @@ export interface Entry {
     tags: string[]
     embedding_status: string
     embedding: number
+    category: EntryCategory | null
+    starred: boolean
 }
+
+export type EntryCategory =
+    | 'dream'
+    | 'journal'
+    | 'trip report'
+    | 'outing'
+    | 'essay'
+    | 'note'
+    | 'other'
 
 // Partial match returned by the SQL RPC
 export type RelatedEntryMatchPartial = {
@@ -20,7 +31,7 @@ export type RelatedEntryMatchPartial = {
 // Full entry with similarity attached
 export type RelatedEntryFull = {
     id: string;
-    title: string;
+    title: string | null;
     body: string;
     event_date: string;
     tags: string[];

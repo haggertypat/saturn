@@ -43,7 +43,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
     // Hydration-safe: start with base values (from entry / defaults), then hydrate drafts in useEffect
     const base = useMemo(() => {
         return {
-            title: entry?.title || '',
+            title: entry?.title ?? '',
             body: entry?.body || '',
             eventDate: entry?.event_date || new Date().toISOString().slice(0, 10),
             tags: (entry?.tags || []) as string[],
@@ -193,7 +193,7 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
         setError(null)
 
         const entryData = {
-            title,
+            title: title.trim() ? title : null,
             body,
             event_date: new Date(eventDate).toISOString(),
             tags,
@@ -252,7 +252,6 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                 <input
                     id="title"
                     type="text"
-                    required
                     maxLength={250}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}

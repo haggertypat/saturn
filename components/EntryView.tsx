@@ -206,7 +206,7 @@ export default function EntryView({ entry }: { entry: Entry }) {
                     <div className="flex justify-between items-center">
                         <div>
                             <h1 className="entry-title">
-                                {entry.title}
+                                {entry.title ?? 'Untitled'}
                             </h1>
                         </div>
                         <div className="text-sm">
