@@ -11,6 +11,7 @@ import { fetchTopMatches } from "@/lib/entries";
 import EntryCard from "@/components/EntryCard";
 import {EntryWithSimilarity} from "@/lib/entries";
 import {PencilIcon} from '@heroicons/react/24/outline'
+import StarredBadge from '@/components/StarredBadge'
 
 function EmbeddingBadge({ status }: { status: string }) {
     const map: Record<string, string> = {
@@ -214,7 +215,11 @@ export default function EntryView({ entry }: { entry: Entry }) {
                                 </p>
                             )}
                         </div>
-                        <div className="text-sm">
+                        <div className="flex items-center gap-2 text-sm">
+                            <StarredBadge
+                                entryId={entry.id}
+                                initialStarred={entry.starred}
+                            />
                             <Button
                                 href={`/entries/${entry.id}/edit`}
                                 variant="secondary"

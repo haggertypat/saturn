@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import { forwardRef, useState } from 'react';
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import StarredBadge from '@/components/StarredBadge'
 
 interface EntryCardProps {
     entry: Entry;
@@ -96,13 +97,19 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete 
                                     </p>
                                 )}
                             </div>
-                            <time className="text-sm">
-                                {eventDate.toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric'
-                                })}
-                            </time>
+                            <div className="flex flex-col items-end gap-2 text-sm">
+                                <time>
+                                    {eventDate.toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric'
+                                    })}
+                                </time>
+                                <StarredBadge
+                                    entryId={entry.id}
+                                    initialStarred={entry.starred}
+                                />
+                            </div>
                         </div>
 
                         <div className="prose prose-sm dark:prose-invert max-w-none">
