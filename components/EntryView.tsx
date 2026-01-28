@@ -204,7 +204,7 @@ export default function EntryView({ entry }: { entry: Entry }) {
         <article className="">
             <div className="mb-2">
                 <div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center group">
                         <div>
                             <h1 className="entry-title">
                                 {entry.title ?? 'Untitled'}
@@ -216,14 +216,10 @@ export default function EntryView({ entry }: { entry: Entry }) {
                             )}
                         </div>
                         <div className="flex items-center gap-2 text-sm">
-                            <StarredBadge
-                                entryId={entry.id}
-                                initialStarred={entry.starred}
-                            />
                             <Button
                                 href={`/entries/${entry.id}/edit`}
                                 variant="secondary"
-                                className="inline-flex items-center gap-1"
+                                className="inline-flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
                             >
                                 <PencilIcon className="h-4 w-4" /> Edit
                             </Button>
@@ -248,6 +244,11 @@ export default function EntryView({ entry }: { entry: Entry }) {
             </div>
 
             <div className="flex justify-end text-sm gap-4 pt-6 mt-6 border-t border-gray-200">
+                <StarredBadge
+                    entryId={entry.id}
+                    initialStarred={entry.starred}
+                />
+
                 <Button
                     href={`/entries/${entry.id}/edit`}
                     variant="secondary"
