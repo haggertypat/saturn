@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import PinGate from '@/components/PinGate'
 
 export const metadata: Metadata = {
     title: 'Saturn',
@@ -33,7 +34,7 @@ export default function RootLayout({
             <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         </head>
         <body className="antialiased">
-            {children}
+            <PinGate>{children}</PinGate>
         </body>
         </html>
     )
