@@ -16,17 +16,61 @@ export default function PinGate({ children }: PinGateProps) {
   const [error, setError] = useState("")
   const [checked, setChecked] = useState(false)
 
-  useEffect(() => {
+  const evaluateUnlockStatus = () => {
     const stored = window.localStorage.getItem(STORAGE_KEY)
     const storedTimestamp = stored ? Number(stored) : NaN
     if (Number.isFinite(storedTimestamp)) {
       const age = Date.now() - storedTimestamp
       if (age < UNLOCK_DURATION_MS) {
         setIsUnlocked(true)
+        return
       }
     }
+    setIsUnlocked(false)
+  }
+
+  useEffect(() => {
+    evaluateUnlockStatus()
     setChecked(true)
   }, [])
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        evaluateUnlockStatus()
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isUnlocked) {
+      return
+    }
+
+    const stored = window.localStorage.getItem(STORAGE_KEY)
+    const storedTimestamp = stored ? Number(stored) : NaN
+    const remainingMs = Number.isFinite(storedTimestamp)
+      ? UNLOCK_DURATION_MS - (Date.now() - storedTimestamp)
+      : 0
+
+    if (remainingMs <= 0) {
+      setIsUnlocked(false)
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setIsUnlocked(false)
+    }, remainingMs)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [isUnlocked])
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
