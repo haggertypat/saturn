@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 
 const PIN_CODE = "2727"
 const STORAGE_KEY = "saturn:pin-unlock-at"
+const SESSION_KEY = "saturn:pin-unlocked"
 const UNLOCK_DURATION_MS = 1000 * 60 * 30
 
 type PinGateProps = {
@@ -19,7 +20,8 @@ export default function PinGate({ children }: PinGateProps) {
   const evaluateUnlockStatus = () => {
     const stored = window.localStorage.getItem(STORAGE_KEY)
     const storedTimestamp = stored ? Number(stored) : NaN
-    if (Number.isFinite(storedTimestamp)) {
+    const sessionUnlocked = window.sessionStorage.getItem(SESSION_KEY) === "true"
+    if (Number.isFinite(storedTimestamp) && sessionUnlocked) {
       const age = Date.now() - storedTimestamp
       if (age < UNLOCK_DURATION_MS) {
         setIsUnlocked(true)
@@ -76,6 +78,7 @@ export default function PinGate({ children }: PinGateProps) {
     event.preventDefault()
     if (pin === PIN_CODE) {
       window.localStorage.setItem(STORAGE_KEY, String(Date.now()))
+      window.sessionStorage.setItem(SESSION_KEY, "true")
       setIsUnlocked(true)
       setError("")
       setPin("")
@@ -97,7 +100,7 @@ export default function PinGate({ children }: PinGateProps) {
       <div className="w-full max-w-sm rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl">
         <h1 className="text-xl font-semibold">Enter PIN to continue</h1>
         <p className="mt-2 text-sm text-slate-400">
-          This unlock lasts 30 minutes on this browser.
+          This unlock lasts 30 minutes and resets when the tab is closed.
         </p>
         <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
           <div>
