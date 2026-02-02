@@ -24,22 +24,30 @@ export default function PinGate({ children }: PinGateProps) {
     if (Number.isFinite(storedTimestamp) && sessionUnlocked) {
       const age = Date.now() - storedTimestamp
       if (age < UNLOCK_DURATION_MS) {
-        setIsUnlocked(true)
-        return
+        return true
       }
     }
-    setIsUnlocked(false)
+    return false
   }
 
   useEffect(() => {
-    evaluateUnlockStatus()
-    setChecked(true)
+    const nextUnlocked = evaluateUnlockStatus()
+    const timeoutId = window.setTimeout(() => {
+      setIsUnlocked(nextUnlocked)
+      setChecked(true)
+    }, 0)
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
   }, [])
 
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        evaluateUnlockStatus()
+        const nextUnlocked = evaluateUnlockStatus()
+        window.setTimeout(() => {
+          setIsUnlocked(nextUnlocked)
+        }, 0)
       }
     }
 
@@ -61,8 +69,12 @@ export default function PinGate({ children }: PinGateProps) {
       : 0
 
     if (remainingMs <= 0) {
-      setIsUnlocked(false)
-      return
+      const timeoutId = window.setTimeout(() => {
+        setIsUnlocked(false)
+      }, 0)
+      return () => {
+        window.clearTimeout(timeoutId)
+      }
     }
 
     const timeoutId = window.setTimeout(() => {
