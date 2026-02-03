@@ -24,6 +24,7 @@ export default function EntryList() {
     const [loading, setLoading] = useState(false)
     const [hasFetched, setHasFetched] = useState(false)
     const [hasMore, setHasMore] = useState(true)
+    const [viewMode, setViewMode] = useState<'cards' | 'long'>('cards')
 
     const [q, setQ] = useState('')
     const debouncedQ = useDebouncedValue(q, 250)
@@ -119,8 +120,8 @@ export default function EntryList() {
     )
 
     return (
-        <div className="flex flex-col gap-4">
-            <div className="flex gap-2">
+        <div className={`flex flex-col ${viewMode === 'cards' ? 'gap-4' : 'gap-0'}`}>
+            <div className="flex flex-wrap gap-2">
                 <input
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
@@ -137,6 +138,13 @@ export default function EntryList() {
                 >
                     {order === 'desc' ? 'Newest' : 'Oldest'}
                 </Button>
+                <Button
+                    onClick={() => setViewMode((mode) => (mode === 'cards' ? 'long' : 'cards'))}
+                    title="Toggle view mode"
+                    variant="secondary"
+                >
+                    View: {viewMode === 'cards' ? 'Cards' : 'Long form'}
+                </Button>
             </div>
 
             {entries.map((entry, i) => {
@@ -147,6 +155,7 @@ export default function EntryList() {
                         key={entry.id}
                         ref={shouldObserveLast ? lastEntryRef : null}
                         entry={entry}
+                        viewMode={viewMode}
                         onDelete={(id) => {
                             entriesRef.current = entriesRef.current.filter((item) => item.id !== id)
                             setEntries(entriesRef.current)
