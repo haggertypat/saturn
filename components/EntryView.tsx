@@ -47,11 +47,20 @@ function EmbedControls({
         setRunning(true);
 
         try {
-            await fetch("/api/embed-entry", {
+            const res = await fetch("/api/embed-entry", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: entryId, body: body }),
             });
+            if (!res.ok) {
+                const payload = await res.json().catch(() => null);
+                const message = payload?.error ?? "Failed to rerun embedding.";
+                throw new Error(message);
+            }
+        } catch (error) {
+            const message =
+                error instanceof Error ? error.message : "Failed to rerun embedding.";
+            alert(message);
         } finally {
             setRunning(false);
         }
