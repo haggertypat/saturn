@@ -25,6 +25,7 @@ export default function EntryList() {
     const [hasFetched, setHasFetched] = useState(false)
     const [hasMore, setHasMore] = useState(true)
     const [viewMode, setViewMode] = useState<'cards' | 'long'>('cards')
+    const [isHydrated, setIsHydrated] = useState(false)
     const viewModeStorageKey = 'entries:viewMode'
 
     const [q, setQ] = useState('')
@@ -50,6 +51,7 @@ export default function EntryList() {
             setViewMode(stored)
         }
         hasLoadedViewMode.current = true
+        setIsHydrated(true)
     }, [])
 
     useEffect(() => {
@@ -160,7 +162,7 @@ export default function EntryList() {
                     title="Toggle view mode"
                     variant="secondary"
                 >
-                    View: {viewMode === 'cards' ? 'Cards' : 'Long form'}
+                    View: {(isHydrated ? viewMode : 'cards') === 'cards' ? 'Cards' : 'Long form'}
                 </Button>
             </div>
 
