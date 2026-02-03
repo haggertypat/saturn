@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import EntryCard from './EntryCard'
 import type { Entry } from '@/lib/types'
 import {Button} from "@/components/Button"
+import {ArrowUpIcon, ArrowDownIcon, DocumentIcon, RectangleStackIcon} from '@heroicons/react/24/outline'
 
 function useDebouncedValue<T>(value: T, delayMs: number) {
     const [debounced, setDebounced] = useState(value)
@@ -19,11 +20,17 @@ type EntriesResponse = {
     nextCursor: string | null
 }
 
-export default function EntryList() {
+type EntryListProps = {
+    initialViewMode: 'cards' | 'long'
+}
+
+export default function EntryList({ initialViewMode }: EntryListProps) {
     const [entries, setEntries] = useState<Entry[]>([])
     const [loading, setLoading] = useState(false)
     const [hasFetched, setHasFetched] = useState(false)
     const [hasMore, setHasMore] = useState(true)
+    const [viewMode, setViewMode] = useState<'cards' | 'long'>(initialViewMode)
+    const viewModeCookieName = 'entries-view-mode'
 
     const [q, setQ] = useState('')
     const debouncedQ = useDebouncedValue(q, 250)
@@ -40,6 +47,10 @@ export default function EntryList() {
     useEffect(() => {
         hasMoreRef.current = hasMore
     }, [hasMore])
+
+    useEffect(() => {
+        document.cookie = `${viewModeCookieName}=${viewMode}; path=/; max-age=2592000; samesite=lax`
+    }, [viewMode, viewModeCookieName])
 
     const fetchEntries = useCallback(
         async (opts: { cursor?: string | null; q?: string; order: 'asc' | 'desc' }) => {
@@ -119,8 +130,8 @@ export default function EntryList() {
     )
 
     return (
-        <div className="flex flex-col gap-4">
-            <div className="flex gap-2">
+        <div className={`flex flex-col ${viewMode === 'cards' ? 'gap-4' : 'gap-0'}`}>
+            <div className="flex flex-wrap gap-2">
                 <input
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
@@ -135,25 +146,43 @@ export default function EntryList() {
                     title="Toggle date order"
                     variant="secondary"
                 >
-                    {order === 'desc' ? 'Newest' : 'Oldest'}
+                    {order === 'desc' ? (
+                        <ArrowDownIcon className="h-4 w-4" />
+                    ) : (
+                        <ArrowUpIcon className="h-4 w-4" />
+                    )}
+                </Button>
+                <Button
+                    onClick={() => setViewMode((mode) => (mode === 'cards' ? 'long' : 'cards'))}
+                    title="Toggle view mode"
+                    variant="secondary"
+                >
+                    {viewMode === 'cards' ? (
+                        <RectangleStackIcon className="h-4 w-4" />
+                    ) : (
+                        <DocumentIcon className="h-4 w-4" />
+                    )}
                 </Button>
             </div>
 
-            {entries.map((entry, i) => {
-                const isLast = i === entries.length - 1
-                const shouldObserveLast = isLast && !!nextCursorRef.current
-                return (
-                    <EntryCard
-                        key={entry.id}
-                        ref={shouldObserveLast ? lastEntryRef : null}
-                        entry={entry}
-                        onDelete={(id) => {
-                            entriesRef.current = entriesRef.current.filter((item) => item.id !== id)
-                            setEntries(entriesRef.current)
-                        }}
-                    />
-                )
-            })}
+            <div className={` ${viewMode === 'cards' ? '' : 'mt-4'}`}>
+                {entries.map((entry, i) => {
+                    const isLast = i === entries.length - 1
+                    const shouldObserveLast = isLast && !!nextCursorRef.current
+                    return (
+                        <EntryCard
+                            key={entry.id}
+                            ref={shouldObserveLast ? lastEntryRef : null}
+                            entry={entry}
+                            viewMode={viewMode}
+                            onDelete={(id) => {
+                                entriesRef.current = entriesRef.current.filter((item) => item.id !== id)
+                                setEntries(entriesRef.current)
+                            }}
+                        />
+                    )
+                })}
+            </div>
 
             {loading &&
                 Array.from({ length: 3 }).map((_, i) => (

@@ -11,9 +11,10 @@ import StarredBadge from '@/components/StarredBadge'
 interface EntryCardProps {
     entry: Entry;
     onDelete?: (id: string) => void;
+    viewMode?: 'cards' | 'long';
 }
 
-const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete }, ref) => {
+const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete, viewMode = 'cards' }, ref) => {
     const router = useRouter()
     const supabase = createClient()
     const [isDeleting, setIsDeleting] = useState(false)
@@ -31,7 +32,9 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete 
         Number(day)
     )
 
+    const isLongForm = viewMode === 'long'
     const preview = entry.body.slice(0, 200) + (entry.body.length > 200 ? '...' : '')
+    const body = isLongForm ? entry.body : preview
 
     return (
         <div ref={ref}> {/* observer attached here */}
@@ -90,9 +93,14 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete 
                     </button>
                 </div>
                 <Link href={`/entries/${entry.id}`}>
-                    <article className="border border-neutral-200 dark:border-neutral-600 rounded-md
-                        p-6 mb-1.5 hover:border-neutral-400 dark:hover:border-neutral-400 transition-colors cursor-pointer">
-                        <div className="flex justify-between items-start mb-2">
+                    <article
+                        className={
+                            isLongForm
+                                ? "cursor-pointer py-6"
+                                : "border border-neutral-200 dark:border-neutral-600 rounded-md p-6 mb-1.5 hover:border-neutral-400 dark:hover:border-neutral-400 transition-colors cursor-pointer"
+                        }
+                    >
+                        <div className={`flex justify-between items-start ${isLongForm ? 'mb-4' : 'mb-2'}`}>
                             <div className="space-y-1">
                                 <h3 className="text-lg font-medium ">{entry.title ?? 'Untitled'}</h3>
                             </div>
@@ -122,7 +130,7 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete 
                         </div>
 
                         <div className="prose prose-sm dark:prose-invert max-w-none">
-                            <ReactMarkdown>{preview}</ReactMarkdown>
+                            <ReactMarkdown>{body}</ReactMarkdown>
                         </div>
                     </article>
                 </Link>
