@@ -70,14 +70,14 @@ function EmbedControls({
         <div className="flex items-center gap-2">
             <EmbeddingBadge status={status} />
 
-            <Button
-                onClick={rerunEmbedding}
-                variant="ghost"
-                disabled={running}
-                className="text-xs"
-            >
-                {running ? "Embedding…" : "Re-run"}
-            </Button>
+            {/*<Button*/}
+            {/*    onClick={rerunEmbedding}*/}
+            {/*    variant="ghost"*/}
+            {/*    disabled={running}*/}
+            {/*    className="text-xs"*/}
+            {/*>*/}
+            {/*    {running ? "Embedding…" : "Re-run"}*/}
+            {/*</Button>*/}
 
             {/*<Button*/}
             {/*    variant="ghost"*/}

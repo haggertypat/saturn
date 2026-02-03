@@ -10,7 +10,7 @@ const supabase = createClient(
 );
 
 export async function POST() {
-    const expectedSecret = process.env.EMBED_CRON_SECRET;
+    const expectedSecret = process.env.NEXT_PUBLIC_EMBED_CRON_SECRET;
     if (!expectedSecret) {
         return NextResponse.json({ error: "Missing cron secret" }, { status: 500 });
     }
