@@ -20,10 +20,13 @@ export async function POST() {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { data: entries } = await supabase
+    const { data: entries, error } = await supabase
         .from("entries")
         .select("id, body")
         .in("embedding_status", ["pending", "failed"]);
+    if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
     let failed = 0;
     for (const entry of entries ?? []) {
