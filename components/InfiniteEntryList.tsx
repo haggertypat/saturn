@@ -22,9 +22,10 @@ type EntriesResponse = {
 
 type EntryListProps = {
     initialViewMode: 'cards' | 'long'
+    initialOrder: 'asc' | 'desc'
 }
 
-export default function EntryList({ initialViewMode }: EntryListProps) {
+export default function EntryList({ initialViewMode, initialOrder }: EntryListProps) {
     const [entries, setEntries] = useState<Entry[]>([])
     const [loading, setLoading] = useState(false)
     const [hasFetched, setHasFetched] = useState(false)
@@ -35,14 +36,17 @@ export default function EntryList({ initialViewMode }: EntryListProps) {
     const [q, setQ] = useState('')
     const debouncedQ = useDebouncedValue(q, 250)
 
-    const [order, setOrder] = useState<'asc' | 'desc'>('desc')
+    const [order, setOrder] = useState<'asc' | 'desc'>(initialOrder)
+    const orderCookieName = 'entries-sort-order'
 
     const entriesRef = useRef<Entry[]>([])
     const nextCursorRef = useRef<string | null>(null)
     const observerRef = useRef<IntersectionObserver | null>(null)
+    const scrollPositionRef = useRef(0)
 
     const isFetchingRef = useRef(false)
     const hasMoreRef = useRef(true)
+    const isRestoringRef = useRef(false)
 
     useEffect(() => {
         hasMoreRef.current = hasMore
@@ -51,6 +55,10 @@ export default function EntryList({ initialViewMode }: EntryListProps) {
     useEffect(() => {
         document.cookie = `${viewModeCookieName}=${viewMode}; path=/; max-age=2592000; samesite=lax`
     }, [viewMode, viewModeCookieName])
+
+    useEffect(() => {
+        document.cookie = `${orderCookieName}=${order}; path=/; max-age=2592000; samesite=lax`
+    }, [order, orderCookieName])
 
     const fetchEntries = useCallback(
         async (opts: { cursor?: string | null; q?: string; order: 'asc' | 'desc' }) => {
@@ -91,9 +99,15 @@ export default function EntryList({ initialViewMode }: EntryListProps) {
         []
     )
 
-    // This is the key useEffect change:
-    // reset + fetch whenever query OR order changes
     useEffect(() => {
+        const hasPendingRestore =
+            typeof window !== 'undefined' &&
+            sessionStorage.getItem('entries-list-restoring') &&
+            sessionStorage.getItem('entries-list-state')
+        if (hasPendingRestore) {
+            return
+        }
+
         entriesRef.current = []
         setEntries([])
         nextCursorRef.current = null
@@ -127,6 +141,91 @@ export default function EntryList({ initialViewMode }: EntryListProps) {
             observerRef.current.observe(node)
         },
         [fetchEntries, debouncedQ, order]
+    )
+
+    const saveScrollPosition = useCallback(() => {
+        scrollPositionRef.current = window.scrollY
+    }, [])
+
+    useEffect(() => {
+        const onScroll = () => {
+            if (isRestoringRef.current) return
+            saveScrollPosition()
+        }
+
+        window.addEventListener('scroll', onScroll, { passive: true })
+        return () => window.removeEventListener('scroll', onScroll)
+    }, [saveScrollPosition])
+
+    useEffect(() => {
+        const isRestoring = sessionStorage.getItem('entries-list-restoring')
+        const listStateRaw = sessionStorage.getItem('entries-list-state')
+        if (!isRestoring || !listStateRaw) {
+            return
+        }
+
+        const parsed = JSON.parse(listStateRaw) as {
+            entries: Entry[]
+            nextCursor: string | null
+            hasMore: boolean
+            order: 'asc' | 'desc'
+            q: string
+            viewMode: 'cards' | 'long'
+            scrollY: number
+        }
+
+        const shouldRestore =
+            parsed.order === order &&
+            parsed.q === debouncedQ &&
+            parsed.viewMode === viewMode
+
+        if (!shouldRestore) {
+            sessionStorage.removeItem('entries-list-restoring')
+            sessionStorage.removeItem('entries-list-state')
+            return
+        }
+
+        isRestoringRef.current = true
+        entriesRef.current = parsed.entries
+        setEntries(parsed.entries)
+        nextCursorRef.current = parsed.nextCursor
+        setHasMore(parsed.hasMore)
+        setHasFetched(true)
+        setLoading(false)
+        scrollPositionRef.current = parsed.scrollY
+
+        requestAnimationFrame(() => {
+            window.scrollTo({ top: scrollPositionRef.current })
+            isRestoringRef.current = false
+        })
+
+        sessionStorage.removeItem('entries-list-restoring')
+        sessionStorage.removeItem('entries-list-state')
+    }, [debouncedQ, order, viewMode])
+
+    const persistListState = useCallback(
+        (scrollY?: number) => {
+            const snapshot = {
+                entries: entriesRef.current,
+                nextCursor: nextCursorRef.current,
+                hasMore: hasMoreRef.current,
+                order,
+                q: debouncedQ,
+                viewMode,
+                scrollY: scrollY ?? scrollPositionRef.current,
+            }
+
+            sessionStorage.setItem('entries-list-state', JSON.stringify(snapshot))
+        },
+        [debouncedQ, order, viewMode]
+    )
+
+    const handleEntryClick = useCallback(
+        (scrollY?: number) => {
+            persistListState(scrollY)
+            sessionStorage.setItem('entries-list-restoring', 'true')
+        },
+        [persistListState]
     )
 
     return (
@@ -175,6 +274,7 @@ export default function EntryList({ initialViewMode }: EntryListProps) {
                             ref={shouldObserveLast ? lastEntryRef : null}
                             entry={entry}
                             viewMode={viewMode}
+                            onNavigate={handleEntryClick}
                             onDelete={(id) => {
                                 entriesRef.current = entriesRef.current.filter((item) => item.id !== id)
                                 setEntries(entriesRef.current)

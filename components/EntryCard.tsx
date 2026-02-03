@@ -12,9 +12,10 @@ interface EntryCardProps {
     entry: Entry;
     onDelete?: (id: string) => void;
     viewMode?: 'cards' | 'long';
+    onNavigate?: (scrollY?: number) => void;
 }
 
-const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete, viewMode = 'cards' }, ref) => {
+const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete, viewMode = 'cards', onNavigate }, ref) => {
     const router = useRouter()
     const supabase = createClient()
     const [isDeleting, setIsDeleting] = useState(false)
@@ -92,7 +93,12 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete,
                         {isDeleting ? 'Deleting...' : 'Delete'}
                     </button>
                 </div>
-                <Link href={`/entries/${entry.id}`}>
+                <Link
+                    href={`/entries/${entry.id}`}
+                    onClick={() => {
+                        onNavigate?.(window.scrollY)
+                    }}
+                >
                     <article
                         className={
                             isLongForm

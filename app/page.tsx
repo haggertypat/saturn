@@ -8,8 +8,10 @@ export default async function Home() {
     const supabase = await createServerSupabaseClient()
     const cookieStore = await cookies()
     const viewModeCookie = cookieStore.get('entries-view-mode')?.value
+    const orderCookie = cookieStore.get('entries-sort-order')?.value
     const initialViewMode =
         viewModeCookie === 'long' || viewModeCookie === 'cards' ? viewModeCookie : 'cards'
+    const initialOrder = orderCookie === 'asc' || orderCookie === 'desc' ? orderCookie : 'desc'
 
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -21,7 +23,7 @@ export default async function Home() {
         <div className="min-h-screen">
             <Header />
             <main className="max-w-2xl mx-auto py-10 px-4">
-                <InfiniteEntryList initialViewMode={initialViewMode} />
+                <InfiniteEntryList initialOrder={initialOrder} initialViewMode={initialViewMode} />
             </main>
         </div>
     )
