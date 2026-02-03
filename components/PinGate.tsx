@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 
 const PIN_CODE = "2727"
+const PIN_GATE_ENABLED = process.env.NEXT_PUBLIC_PIN_GATE_ENABLED !== "false"
 const STORAGE_KEY = "saturn:pin-unlock-at"
 const SESSION_KEY = "saturn:pin-unlocked"
 const UNLOCK_DURATION_MS = 1000 * 60 * 30
@@ -31,6 +32,9 @@ export default function PinGate({ children }: PinGateProps) {
   }
 
   useEffect(() => {
+    if (!PIN_GATE_ENABLED) {
+      return
+    }
     const nextUnlocked = evaluateUnlockStatus()
     const timeoutId = window.setTimeout(() => {
       setIsUnlocked(nextUnlocked)
@@ -42,6 +46,9 @@ export default function PinGate({ children }: PinGateProps) {
   }, [])
 
   useEffect(() => {
+    if (!PIN_GATE_ENABLED) {
+      return
+    }
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         const nextUnlocked = evaluateUnlockStatus()
@@ -58,6 +65,9 @@ export default function PinGate({ children }: PinGateProps) {
   }, [])
 
   useEffect(() => {
+    if (!PIN_GATE_ENABLED) {
+      return
+    }
     if (!isUnlocked) {
       return
     }
@@ -97,6 +107,10 @@ export default function PinGate({ children }: PinGateProps) {
       return
     }
     setError("Incorrect PIN. Try again.")
+  }
+
+  if (!PIN_GATE_ENABLED) {
+    return <>{children}</>
   }
 
   if (!checked) {

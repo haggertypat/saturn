@@ -50,6 +50,10 @@ OPENAI_API_KEY=...
 
 # Optional: protect the embeddings cron endpoint
 EMBED_CRON_SECRET=...
+
+# Optional: disable the PIN gate entirely
+# Set to "false" to skip the PIN prompt.
+NEXT_PUBLIC_PIN_GATE_ENABLED=false
 ```
 
 ## Supabase setup
