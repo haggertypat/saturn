@@ -228,6 +228,20 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
         [persistListState]
     )
 
+    useEffect(() => {
+        const handlePageHide = () => {
+            persistListState(window.scrollY)
+            sessionStorage.setItem('entries-list-restoring', 'true')
+        }
+
+        window.addEventListener('pagehide', handlePageHide)
+        window.addEventListener('beforeunload', handlePageHide)
+        return () => {
+            window.removeEventListener('pagehide', handlePageHide)
+            window.removeEventListener('beforeunload', handlePageHide)
+        }
+    }, [persistListState])
+
     return (
         <div className={`flex flex-col ${viewMode === 'cards' ? 'gap-4' : 'gap-0'}`}>
             <div className="flex flex-wrap gap-2">
