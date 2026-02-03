@@ -16,7 +16,7 @@ export async function tryEmbedEntry(entryId: string, body: string) {
     try {
         const embedding = await embedText(body);
 
-        await supabase
+        const { error } = await supabase
             .from("entries")
             .update({
                 embedding,
@@ -24,15 +24,21 @@ export async function tryEmbedEntry(entryId: string, body: string) {
                 embedding_error: null,
             })
             .eq("id", entryId);
+        if (error) {
+            throw new Error(`Failed to update embedding: ${error.message}`);
+        }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-        await supabase
+        const { error } = await supabase
             .from("entries")
             .update({
                 embedding_status: "failed",
                 embedding_error: err.message ?? "embedding failed",
             })
             .eq("id", entryId);
+        if (error) {
+            throw new Error(`Failed to persist embedding error: ${error.message}`);
+        }
+        throw err;
     }
 }
-

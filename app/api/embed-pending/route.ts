@@ -10,7 +10,7 @@ const supabase = createClient(
 );
 
 export async function POST() {
-    const expectedSecret = process.env.EMBED_CRON_SECRET;
+    const expectedSecret = process.env.NEXT_PUBLIC_EMBED_CRON_SECRET;
     if (!expectedSecret) {
         return NextResponse.json({ error: "Missing cron secret" }, { status: 500 });
     }
@@ -20,17 +20,27 @@ export async function POST() {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { data: entries } = await supabase
+    const { data: entries, error } = await supabase
         .from("entries")
         .select("id, body")
         .in("embedding_status", ["pending", "failed"]);
+    if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
+    let failed = 0;
     for (const entry of entries ?? []) {
         // sequential on purpose (quota safety)
-        await tryEmbedEntry(entry.id, entry.body);
+        try {
+            await tryEmbedEntry(entry.id, entry.body);
+        } catch (error) {
+            failed += 1;
+            console.error("Embedding failed for entry", entry.id, error);
+        }
     }
 
     return NextResponse.json({
         processed: entries?.length ?? 0,
+        failed,
     });
 }
