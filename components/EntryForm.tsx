@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/client'
 import type { Entry } from '@/lib/types'
 import { Button } from '@/components/Button'
 import ZenEditor from './ZenEditor'
-import StarredBadge from '@/components/StarredBadge'
 import {ArrowsPointingOutIcon} from "@heroicons/react/24/outline";
 
 type DraftPayload = {
@@ -315,12 +314,6 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                 {/*        <option value="other">Other</option>*/}
                 {/*    </select>*/}
                 {/*</div>*/}
-                {entry && (
-                    <StarredBadge
-                        entryId={entry.id}
-                        initialStarred={entry.starred}
-                    />
-                )}
                 <div>
                     <Button type="button" variant="ghost" onClick={() => setIsZenMode(true)}>
                         <ArrowsPointingOutIcon className="h-5 w-5" />
