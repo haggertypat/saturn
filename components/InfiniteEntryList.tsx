@@ -19,14 +19,17 @@ type EntriesResponse = {
     nextCursor: string | null
 }
 
-export default function EntryList() {
+type EntryListProps = {
+    initialViewMode: 'cards' | 'long'
+}
+
+export default function EntryList({ initialViewMode }: EntryListProps) {
     const [entries, setEntries] = useState<Entry[]>([])
     const [loading, setLoading] = useState(false)
     const [hasFetched, setHasFetched] = useState(false)
     const [hasMore, setHasMore] = useState(true)
-    const [viewMode, setViewMode] = useState<'cards' | 'long'>('cards')
-    const [isHydrated, setIsHydrated] = useState(false)
-    const viewModeStorageKey = 'entries:viewMode'
+    const [viewMode, setViewMode] = useState<'cards' | 'long'>(initialViewMode)
+    const viewModeCookieName = 'entries-view-mode'
 
     const [q, setQ] = useState('')
     const debouncedQ = useDebouncedValue(q, 250)
@@ -36,7 +39,6 @@ export default function EntryList() {
     const entriesRef = useRef<Entry[]>([])
     const nextCursorRef = useRef<string | null>(null)
     const observerRef = useRef<IntersectionObserver | null>(null)
-    const hasLoadedViewMode = useRef(false)
 
     const isFetchingRef = useRef(false)
     const hasMoreRef = useRef(true)
@@ -46,20 +48,8 @@ export default function EntryList() {
     }, [hasMore])
 
     useEffect(() => {
-        const stored = sessionStorage.getItem(viewModeStorageKey)
-        if (stored === 'cards' || stored === 'long') {
-            setViewMode(stored)
-        }
-        hasLoadedViewMode.current = true
-        setIsHydrated(true)
-    }, [])
-
-    useEffect(() => {
-        if (!hasLoadedViewMode.current) {
-            return
-        }
-        sessionStorage.setItem(viewModeStorageKey, viewMode)
-    }, [viewMode, viewModeStorageKey])
+        document.cookie = `${viewModeCookieName}=${viewMode}; path=/; max-age=2592000; samesite=lax`
+    }, [viewMode, viewModeCookieName])
 
     const fetchEntries = useCallback(
         async (opts: { cursor?: string | null; q?: string; order: 'asc' | 'desc' }) => {
@@ -162,7 +152,7 @@ export default function EntryList() {
                     title="Toggle view mode"
                     variant="secondary"
                 >
-                    View: {(isHydrated ? viewMode : 'cards') === 'cards' ? 'Cards' : 'Long form'}
+                    View: {viewMode === 'cards' ? 'Cards' : 'Long form'}
                 </Button>
             </div>
 
