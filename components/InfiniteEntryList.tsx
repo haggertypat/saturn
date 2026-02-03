@@ -20,23 +20,12 @@ type EntriesResponse = {
 }
 
 export default function EntryList() {
-    const viewModeStorageKey = 'entries:viewMode'
     const [entries, setEntries] = useState<Entry[]>([])
     const [loading, setLoading] = useState(false)
     const [hasFetched, setHasFetched] = useState(false)
     const [hasMore, setHasMore] = useState(true)
-    const [viewMode, setViewMode] = useState<'cards' | 'long'>(() => {
-        if (typeof window === 'undefined') {
-            return 'cards'
-        }
-
-        const stored = sessionStorage.getItem(viewModeStorageKey)
-        if (stored === 'cards' || stored === 'long') {
-            return stored
-        }
-
-        return 'cards'
-    })
+    const [viewMode, setViewMode] = useState<'cards' | 'long'>('cards')
+    const viewModeStorageKey = 'entries:viewMode'
 
     const [q, setQ] = useState('')
     const debouncedQ = useDebouncedValue(q, 250)
@@ -46,6 +35,7 @@ export default function EntryList() {
     const entriesRef = useRef<Entry[]>([])
     const nextCursorRef = useRef<string | null>(null)
     const observerRef = useRef<IntersectionObserver | null>(null)
+    const hasLoadedViewMode = useRef(false)
 
     const isFetchingRef = useRef(false)
     const hasMoreRef = useRef(true)
@@ -55,6 +45,17 @@ export default function EntryList() {
     }, [hasMore])
 
     useEffect(() => {
+        const stored = sessionStorage.getItem(viewModeStorageKey)
+        if (stored === 'cards' || stored === 'long') {
+            setViewMode(stored)
+        }
+        hasLoadedViewMode.current = true
+    }, [])
+
+    useEffect(() => {
+        if (!hasLoadedViewMode.current) {
+            return
+        }
         sessionStorage.setItem(viewModeStorageKey, viewMode)
     }, [viewMode, viewModeStorageKey])
 
