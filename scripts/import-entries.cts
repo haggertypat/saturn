@@ -99,12 +99,15 @@ async function run() {
     }
 
     // Show a sample
-    console.log("Sample entry:");
-    console.log({
-        title: entries[0].title,
-        event_date: entries[0].event_date,
-        body_preview: entries[0].body.slice(0, 200),
-    });
+    const [firstEntry] = entries;
+    if (firstEntry) {
+        console.log("Sample entry:");
+        console.log({
+            title: firstEntry.title,
+            event_date: firstEntry.event_date,
+            body_preview: firstEntry.body.slice(0, 200),
+        });
+    }
 
     if (DRY_RUN) {
         console.log("\nDRY RUN — no rows inserted");
