@@ -82,7 +82,17 @@ function EmbedControls({
             {/*<Button*/}
             {/*    variant="ghost"*/}
             {/*    className="text-xs"*/}
-            {/*    onClick={() => fetch("/api/embed-pending", { method: "POST" })}*/}
+            {/*    onClick={() => {*/}
+            {/*        const secret = process.env.NEXT_PUBLIC_EMBED_CRON_SECRET;*/}
+            {/*        if (!secret) {*/}
+            {/*            alert("Missing NEXT_PUBLIC_EMBED_CRON_SECRET.");*/}
+            {/*            return;*/}
+            {/*        }*/}
+            {/*        fetch("/api/embed-pending", {*/}
+            {/*            method: "POST",*/}
+            {/*            headers: { "x-cron-secret": secret },*/}
+            {/*        });*/}
+            {/*    }}*/}
             {/*>*/}
             {/*    Embed all pending*/}
             {/*</Button>*/}
