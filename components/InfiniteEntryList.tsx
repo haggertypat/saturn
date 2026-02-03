@@ -25,6 +25,7 @@ export default function EntryList() {
     const [hasFetched, setHasFetched] = useState(false)
     const [hasMore, setHasMore] = useState(true)
     const [viewMode, setViewMode] = useState<'cards' | 'long'>('cards')
+    const viewModeStorageKey = 'entries:viewMode'
 
     const [q, setQ] = useState('')
     const debouncedQ = useDebouncedValue(q, 250)
@@ -41,6 +42,17 @@ export default function EntryList() {
     useEffect(() => {
         hasMoreRef.current = hasMore
     }, [hasMore])
+
+    useEffect(() => {
+        const stored = sessionStorage.getItem(viewModeStorageKey)
+        if (stored === 'cards' || stored === 'long') {
+            setViewMode(stored)
+        }
+    }, [viewModeStorageKey])
+
+    useEffect(() => {
+        sessionStorage.setItem(viewModeStorageKey, viewMode)
+    }, [viewMode, viewModeStorageKey])
 
     const fetchEntries = useCallback(
         async (opts: { cursor?: string | null; q?: string; order: 'asc' | 'desc' }) => {
