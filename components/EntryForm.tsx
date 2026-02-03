@@ -292,30 +292,29 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                         className="pl-3 pr-0 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-500 focus:border-transparent"
                     />
                 </div>
-                <div>
-                    <label className="sr-only" htmlFor="category">
-                        Category
-                    </label>
-                    <select
-                        id="category"
-                        value={category ?? ''}
-                        onChange={(e) =>
-                            setCategory(
-                                (e.target.value || null) as Entry['category']
-                            )
-                        }
-                        className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-neutral-500 focus:border-transparent"
-                    >
-                        <option value="">Uncategorized</option>
-                        <option value="dream">Dream</option>
-                        <option value="journal">Journal</option>
-                        <option value="trip report">Trip report</option>
-                        <option value="outing">Outing</option>
-                        <option value="essay">Essay</option>
-                        <option value="note">Note</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
+                {/*<div>*/}
+                {/*    <label className="sr-only" htmlFor="category">*/}
+                {/*        Category*/}
+                {/*    </label>*/}
+                {/*    <select*/}
+                {/*        id="category"*/}
+                {/*        value={category ?? ''}*/}
+                {/*        onChange={(e) =>*/}
+                {/*            setCategory(*/}
+                {/*                (e.target.value || null) as Entry['category']*/}
+                {/*            )*/}
+                {/*        }*/}
+                {/*        className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-neutral-500 focus:border-transparent"*/}
+                {/*    >*/}
+                {/*        <option value="">Uncategorized</option>*/}
+                {/*        <option value="dream">Dream</option>*/}
+                {/*        <option value="journal">Journal</option>*/}
+                {/*        <option value="outing">Outing</option>*/}
+                {/*        <option value="essay">Essay</option>*/}
+                {/*        <option value="note">Note</option>*/}
+                {/*        <option value="other">Other</option>*/}
+                {/*    </select>*/}
+                {/*</div>*/}
                 {entry && (
                     <StarredBadge
                         entryId={entry.id}

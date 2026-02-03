@@ -15,7 +15,6 @@ export interface Entry {
 export type EntryCategory =
     | 'dream'
     | 'journal'
-    | 'trip report'
     | 'outing'
     | 'essay'
     | 'note'
