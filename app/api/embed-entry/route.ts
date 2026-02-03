@@ -15,10 +15,12 @@ export async function POST(req: Request) {
 
     const { id, body } = await req.json();
 
-    // do not throw — background job
     try {
         await tryEmbedEntry(id, body);
-    } catch {}
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "Embedding failed";
+        return NextResponse.json({ error: message }, { status: 500 });
+    }
 
     return NextResponse.json({ ok: true });
 }

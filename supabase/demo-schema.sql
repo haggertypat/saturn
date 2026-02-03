@@ -13,9 +13,13 @@ create table if not exists public.entries (
     tags text[] not null default '{}',
     embedding_status text not null default 'pending',
     embedding vector(1536),
+    embedding_error text,
     category text,
     starred boolean not null default false
 );
+
+alter table public.entries
+    add column if not exists embedding_error text;
 
 create index if not exists entries_event_date_idx on public.entries (event_date desc);
 create index if not exists entries_embedding_idx on public.entries using ivfflat (embedding vector_cosine_ops);

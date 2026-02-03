@@ -25,12 +25,19 @@ export async function POST() {
         .select("id, body")
         .in("embedding_status", ["pending", "failed"]);
 
+    let failed = 0;
     for (const entry of entries ?? []) {
         // sequential on purpose (quota safety)
-        await tryEmbedEntry(entry.id, entry.body);
+        try {
+            await tryEmbedEntry(entry.id, entry.body);
+        } catch (error) {
+            failed += 1;
+            console.error("Embedding failed for entry", entry.id, error);
+        }
     }
 
     return NextResponse.json({
         processed: entries?.length ?? 0,
+        failed,
     });
 }
