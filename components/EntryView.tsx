@@ -33,8 +33,8 @@ function EmbeddingBadge({ status }: { status: string }) {
 }
 
 function EmbedControls({
-                           entryId,
-                           body,
+                           // entryId,
+                           // body,
                            status,
                        }: {
     entryId: string;
