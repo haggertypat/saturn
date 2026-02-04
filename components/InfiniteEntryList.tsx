@@ -104,6 +104,11 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
             typeof window !== 'undefined' &&
             sessionStorage.getItem('entries-list-restoring') &&
             sessionStorage.getItem('entries-list-state')
+        console.log('[entries] reset check', {
+            hasPendingRestore,
+            order,
+            debouncedQ,
+        })
         if (hasPendingRestore) {
             return
         }
@@ -116,6 +121,7 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
 
         if (observerRef.current) observerRef.current.disconnect()
 
+        console.log('[entries] reset + fetch', { order, debouncedQ })
         fetchEntries({ cursor: null, q: debouncedQ, order })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedQ, order])
@@ -160,6 +166,10 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
     useEffect(() => {
         const isRestoring = sessionStorage.getItem('entries-list-restoring')
         const listStateRaw = sessionStorage.getItem('entries-list-state')
+        console.log('[entries] restore check', {
+            isRestoring,
+            hasState: !!listStateRaw,
+        })
         if (!isRestoring || !listStateRaw) {
             return
         }
@@ -179,11 +189,26 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
             parsed.q === debouncedQ &&
             parsed.viewMode === viewMode
 
+        console.log('[entries] restore compare', {
+            parsedOrder: parsed.order,
+            order,
+            parsedQ: parsed.q,
+            debouncedQ,
+            parsedViewMode: parsed.viewMode,
+            viewMode,
+            shouldRestore,
+        })
         if (!shouldRestore) {
             sessionStorage.removeItem('entries-list-restoring')
             return
         }
 
+        console.log('[entries] restoring snapshot', {
+            entryCount: parsed.entries.length,
+            nextCursor: parsed.nextCursor,
+            hasMore: parsed.hasMore,
+            scrollY: parsed.scrollY,
+        })
         isRestoringRef.current = true
         entriesRef.current = parsed.entries
         setEntries(parsed.entries)
@@ -196,6 +221,9 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
         requestAnimationFrame(() => {
             window.scrollTo({ top: scrollPositionRef.current })
             isRestoringRef.current = false
+            console.log('[entries] scroll restored', {
+                scrollY: scrollPositionRef.current,
+            })
         })
 
         sessionStorage.removeItem('entries-list-restoring')
@@ -213,6 +241,15 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
                 scrollY: scrollY ?? scrollPositionRef.current,
             }
 
+            console.log('[entries] persist snapshot', {
+                entryCount: snapshot.entries.length,
+                nextCursor: snapshot.nextCursor,
+                hasMore: snapshot.hasMore,
+                order: snapshot.order,
+                q: snapshot.q,
+                viewMode: snapshot.viewMode,
+                scrollY: snapshot.scrollY,
+            })
             sessionStorage.setItem('entries-list-state', JSON.stringify(snapshot))
         },
         [debouncedQ, order, viewMode]
@@ -220,6 +257,7 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
 
     const handleEntryClick = useCallback(
         (scrollY?: number) => {
+            console.log('[entries] entry click persist', { scrollY })
             persistListState(scrollY)
             sessionStorage.setItem('entries-list-restoring', 'true')
         },
@@ -228,6 +266,7 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
 
     useEffect(() => {
         const handlePageHide = () => {
+            console.log('[entries] pagehide persist', { scrollY: window.scrollY })
             persistListState(window.scrollY)
             sessionStorage.setItem('entries-list-restoring', 'true')
         }
