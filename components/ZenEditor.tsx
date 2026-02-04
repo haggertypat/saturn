@@ -20,7 +20,34 @@ export default function ZenEditor({
                                   }: ZenEditorProps) {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-    const scrollPositionRef = useRef<number | null>(null);
+
+    const focusAndSetSelection = (start: number, end: number) => {
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+        textarea.focus();
+        requestAnimationFrame(() => {
+            textarea.setSelectionRange(start, end);
+        });
+    };
+
+    const getLineMetrics = (textarea: HTMLTextAreaElement) => {
+        const styles = window.getComputedStyle(textarea);
+        const lineHeightValue = parseFloat(styles.lineHeight);
+        const fontSizeValue = parseFloat(styles.fontSize);
+        const lineHeight = Number.isNaN(lineHeightValue)
+            ? fontSizeValue * 1.2
+            : lineHeightValue;
+        const paddingTop = parseFloat(styles.paddingTop) || 0;
+        return { lineHeight, paddingTop };
+    };
+
+    const getLineStartIndex = (lineIndex: number, lines: string[]) => {
+        let cursorIndex = 0;
+        for (let i = 0; i < lineIndex; i += 1) {
+            cursorIndex += (lines[i] ?? "").length + 1;
+        }
+        return cursorIndex;
+    };
 
     const moveCursorToClick = (event: MouseEvent<HTMLDivElement>) => {
         const textarea = textareaRef.current;
@@ -32,68 +59,47 @@ export default function ZenEditor({
             return;
         }
 
+        // We own cursor placement outside the textarea so margin clicks behave
+        // predictably and do not shift scroll position.
         event.preventDefault();
         event.stopPropagation();
 
         const rect = textarea.getBoundingClientRect();
-        const styles = window.getComputedStyle(textarea);
-        const lineHeightValue = parseFloat(styles.lineHeight);
-        const fontSizeValue = parseFloat(styles.fontSize);
-        const lineHeight = Number.isNaN(lineHeightValue)
-            ? fontSizeValue * 1.2
-            : lineHeightValue;
-        const paddingTop = parseFloat(styles.paddingTop) || 0;
-
+        const { lineHeight, paddingTop } = getLineMetrics(textarea);
         const clickY = event.clientY;
         const relativeY = clickY - rect.top - paddingTop;
-
-        const focusAndSetSelection = (start: number, end: number) => {
-            textarea.focus();
-            requestAnimationFrame(() => {
-                textarea.setSelectionRange(start, end);
-            });
-        };
+        const lines = value.split("\n");
+        const contentHeight = lines.length * lineHeight;
 
         if (relativeY <= 0) {
             focusAndSetSelection(0, 0);
             return;
         }
 
-        const lines = value.split("\n");
-        const maxLineIndex = Math.max(0, lines.length - 1);
-        const lineIndex = Math.min(
-            maxLineIndex,
-            Math.floor(relativeY / lineHeight),
-        );
-        const contentHeight = lines.length * lineHeight;
-
-        if (relativeY >= contentHeight || lineIndex >= lines.length) {
+        if (relativeY >= contentHeight) {
             focusAndSetSelection(value.length, value.length);
             return;
         }
 
-        let cursorIndex = 0;
-        for (let i = 0; i < lineIndex; i += 1) {
-            const line = lines[i] ?? "";
-            cursorIndex += line.length + 1;
-        }
-        cursorIndex = Math.min(cursorIndex, value.length);
+        const lineIndex = Math.min(
+            Math.max(0, Math.floor(relativeY / lineHeight)),
+            Math.max(0, lines.length - 1),
+        );
 
+        const cursorIndex = Math.min(
+            getLineStartIndex(lineIndex, lines),
+            value.length,
+        );
         focusAndSetSelection(cursorIndex, cursorIndex);
     };
 
-    // Auto-grow textarea so the PAGE scrolls, not the textarea
+    // Auto-grow textarea so the PAGE scrolls, not the textarea.
+    // We never mutate scrollTop here: scroll position changes only when the user scrolls.
     useLayoutEffect(() => {
         const el = textareaRef.current;
         if (!el) return;
         el.style.height = "auto";
         el.style.height = `${el.scrollHeight}px`;
-
-        const container = scrollContainerRef.current;
-        const snapshot = scrollPositionRef.current;
-        if (container !== null && snapshot !== null) {
-            container.scrollTop = snapshot;
-        }
     }, [value]);
 
     useEffect(() => {
@@ -112,17 +118,7 @@ export default function ZenEditor({
         return () => window.removeEventListener("keydown", handler);
     }, [onExit]);
 
-    const snapshotScrollPosition = () => {
-        const container = scrollContainerRef.current;
-        if (container) {
-            scrollPositionRef.current = container.scrollTop;
-        }
-    };
-
     const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        if (scrollPositionRef.current === null) {
-            snapshotScrollPosition();
-        }
         onChange(event.target.value);
     };
 
@@ -173,7 +169,6 @@ export default function ZenEditor({
                     ref={textareaRef}
                     value={value}
                     onChange={handleChange}
-                    onBeforeInput={snapshotScrollPosition}
                     spellCheck={false}
                     autoCorrect="off"
                     autoCapitalize="off"
@@ -189,6 +184,11 @@ export default function ZenEditor({
             leading-inherit
             whitespace-pre-wrap
           "
+                    style={{
+                        // Keep the editor tall so the title has space at the top,
+                        // while still letting the content scroll naturally.
+                        minHeight: "calc(100vh - 12rem)",
+                    }}
                 />
             </div>
         </div>
