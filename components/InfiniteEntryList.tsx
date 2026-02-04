@@ -102,8 +102,8 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
     useEffect(() => {
         const hasPendingRestore =
             typeof window !== 'undefined' &&
-            (localStorage.getItem('entries-list-state') ||
-                window.history.state?.entriesListState)
+            sessionStorage.getItem('entries-list-restoring') &&
+            sessionStorage.getItem('entries-list-state')
         if (hasPendingRestore) {
             return
         }
@@ -158,7 +158,13 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
     }, [saveScrollPosition])
 
     useEffect(() => {
-        const historyState = window.history.state?.entriesListState as {
+        const isRestoring = sessionStorage.getItem('entries-list-restoring')
+        const listStateRaw = sessionStorage.getItem('entries-list-state')
+        if (!isRestoring || !listStateRaw) {
+            return
+        }
+
+        const parsed = JSON.parse(listStateRaw) as {
             entries: Entry[]
             nextCursor: string | null
             hasMore: boolean
@@ -166,31 +172,6 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
             q: string
             viewMode: 'cards' | 'long'
             scrollY: number
-            savedAt: number
-        } | undefined
-
-        const listStateRaw = localStorage.getItem('entries-list-state')
-        const storageState = listStateRaw
-            ? (JSON.parse(listStateRaw) as {
-                  entries: Entry[]
-                  nextCursor: string | null
-                  hasMore: boolean
-                  order: 'asc' | 'desc'
-                  q: string
-                  viewMode: 'cards' | 'long'
-                  scrollY: number
-                  savedAt: number
-              })
-            : undefined
-
-        const parsed = historyState ?? storageState
-        if (!parsed) {
-            return
-        }
-
-        if (Date.now() - parsed.savedAt > 30 * 60 * 1000) {
-            localStorage.removeItem('entries-list-state')
-            return
         }
 
         const shouldRestore =
@@ -199,7 +180,8 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
             parsed.viewMode === viewMode
 
         if (!shouldRestore) {
-            localStorage.removeItem('entries-list-state')
+            sessionStorage.removeItem('entries-list-restoring')
+            sessionStorage.removeItem('entries-list-state')
             return
         }
 
@@ -217,7 +199,8 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
             isRestoringRef.current = false
         })
 
-        localStorage.removeItem('entries-list-state')
+        sessionStorage.removeItem('entries-list-restoring')
+        sessionStorage.removeItem('entries-list-state')
     }, [debouncedQ, order, viewMode])
 
     const persistListState = useCallback(
@@ -230,14 +213,9 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
                 q: debouncedQ,
                 viewMode,
                 scrollY: scrollY ?? scrollPositionRef.current,
-                savedAt: Date.now(),
             }
 
-            localStorage.setItem('entries-list-state', JSON.stringify(snapshot))
-            window.history.replaceState(
-                { ...window.history.state, entriesListState: snapshot },
-                ''
-            )
+            sessionStorage.setItem('entries-list-state', JSON.stringify(snapshot))
         },
         [debouncedQ, order, viewMode]
     )
@@ -245,6 +223,7 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
     const handleEntryClick = useCallback(
         (scrollY?: number) => {
             persistListState(scrollY)
+            sessionStorage.setItem('entries-list-restoring', 'true')
         },
         [persistListState]
     )
@@ -252,6 +231,7 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
     useEffect(() => {
         const handlePageHide = () => {
             persistListState(window.scrollY)
+            sessionStorage.setItem('entries-list-restoring', 'true')
         }
 
         window.addEventListener('pagehide', handlePageHide)
