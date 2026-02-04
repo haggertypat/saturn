@@ -181,7 +181,6 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
 
         if (!shouldRestore) {
             sessionStorage.removeItem('entries-list-restoring')
-            sessionStorage.removeItem('entries-list-state')
             return
         }
 
@@ -200,7 +199,6 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
         })
 
         sessionStorage.removeItem('entries-list-restoring')
-        sessionStorage.removeItem('entries-list-state')
     }, [debouncedQ, order, viewMode])
 
     const persistListState = useCallback(
