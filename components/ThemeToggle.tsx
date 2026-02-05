@@ -17,8 +17,6 @@ export function ThemeToggle() {
             variant="ghost"
             onClick={toggle}>
             <MoonIcon className="h-5 w-5" />
-
-            Dark mode
         </Button>
     )
 }

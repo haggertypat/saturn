@@ -31,7 +31,7 @@ export default function Header() {
                         variant="ghost"
                         className="inline-flex items-center gap-1"
                     >
-                        <PlusCircleIcon className="h-5 w-5" /> New
+                        <PlusCircleIcon className="h-5 w-5" />
                     </Button>
 
                     <ThemeToggle />
@@ -41,7 +41,7 @@ export default function Header() {
                         variant="ghost"
                         className="inline-flex items-center gap-1"
                     >
-                        <ArrowRightStartOnRectangleIcon className="h-5 w-5" /> Sign Out
+                        <ArrowRightStartOnRectangleIcon className="h-5 w-5" />
                     </Button>
                 </div>
             </div>
