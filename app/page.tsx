@@ -10,6 +10,8 @@ export default async function Home() {
     const viewModeCookie = cookieStore.get('entries-view-mode')?.value
     const initialViewMode =
         viewModeCookie === 'long' || viewModeCookie === 'cards' ? viewModeCookie : 'cards'
+    const orderCookie = cookieStore.get('entries-order')?.value
+    const initialOrder = orderCookie === 'asc' || orderCookie === 'desc' ? orderCookie : 'desc'
 
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -21,7 +23,7 @@ export default async function Home() {
         <div className="min-h-screen">
             <Header />
             <main className="max-w-2xl mx-auto py-10 px-4">
-                <InfiniteEntryList initialViewMode={initialViewMode} />
+                <InfiniteEntryList initialViewMode={initialViewMode} initialOrder={initialOrder} />
             </main>
         </div>
     )
