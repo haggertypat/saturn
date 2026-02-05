@@ -24,13 +24,32 @@ type EntryListProps = {
     initialViewMode: 'cards' | 'long'
 }
 
+
+function getViewModeFromCookie(cookieName: string): 'cards' | 'long' | null {
+    if (typeof document === 'undefined') return null
+
+    const cookie = document.cookie
+        .split('; ')
+        .find((item) => item.startsWith(`${cookieName}=`))
+
+    if (!cookie) return null
+
+    const value = decodeURIComponent(cookie.split('=')[1] ?? '')
+    return value === 'cards' || value === 'long' ? value : null
+}
+
 export default function EntryList({ initialViewMode }: EntryListProps) {
     const [entries, setEntries] = useState<Entry[]>([])
     const [loading, setLoading] = useState(false)
     const [hasFetched, setHasFetched] = useState(false)
     const [hasMore, setHasMore] = useState(true)
-    const [viewMode, setViewMode] = useState<'cards' | 'long'>(initialViewMode)
+    const [viewMode, setViewMode] = useState<'cards' | 'long'>(() => getViewModeFromCookie('entries-view-mode') ?? initialViewMode)
     const viewModeCookieName = 'entries-view-mode'
+
+    useEffect(() => {
+        const nextViewMode = getViewModeFromCookie(viewModeCookieName) ?? initialViewMode
+        setViewMode((current) => (current === nextViewMode ? current : nextViewMode))
+    }, [initialViewMode])
 
     const [q, setQ] = useState('')
     const debouncedQ = useDebouncedValue(q, 250)
@@ -50,7 +69,7 @@ export default function EntryList({ initialViewMode }: EntryListProps) {
 
     useEffect(() => {
         document.cookie = `${viewModeCookieName}=${viewMode}; path=/; max-age=2592000; samesite=lax`
-    }, [viewMode, viewModeCookieName])
+    }, [viewMode])
 
     const fetchEntries = useCallback(
         async (opts: { cursor?: string | null; q?: string; order: 'asc' | 'desc' }) => {
