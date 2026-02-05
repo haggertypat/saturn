@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import EntryCard from './EntryCard'
 import type { Entry } from '@/lib/types'
 import {Button} from "@/components/Button"
-import {ArrowUpIcon, ArrowDownIcon, DocumentIcon, RectangleStackIcon} from '@heroicons/react/24/outline'
+import {ArrowUpIcon, ArrowDownIcon, DocumentIcon, RectangleStackIcon, StarIcon} from '@heroicons/react/24/outline'
 
 function useDebouncedValue<T>(value: T, delayMs: number) {
     const [debounced, setDebounced] = useState(value)
@@ -69,6 +69,7 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
     }, [initialOrder])
 
     const [q, setQ] = useState('')
+    const [starredOnly, setStarredOnly] = useState(false)
     const debouncedQ = useDebouncedValue(q, 250)
 
     const entriesRef = useRef<Entry[]>([])
@@ -91,10 +92,11 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
     }, [order])
 
     const fetchEntries = useCallback(
-        async (opts: { cursor?: string | null; q?: string; order: 'asc' | 'desc' }) => {
+        async (opts: { cursor?: string | null; q?: string; order: 'asc' | 'desc'; starredOnly?: boolean }) => {
             const cursor = opts.cursor ?? null
             const query = (opts.q ?? '').trim()
             const ord = opts.order
+            const starred = opts.starredOnly ?? false
 
             if (isFetchingRef.current) return
             if (cursor && !hasMoreRef.current) return
@@ -107,6 +109,7 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
                 params.set('order', ord)
                 if (cursor) params.set('cursor', cursor)
                 if (query) params.set('q', query)
+                if (starred) params.set('starred', 'true')
 
                 const res = await fetch(`/api/entries?${params.toString()}`)
                 const json: EntriesResponse = await res.json()
@@ -130,7 +133,7 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
     )
 
     // This is the key useEffect change:
-    // reset + fetch whenever query OR order changes
+    // reset + fetch whenever query, order, or starred filter changes
     useEffect(() => {
         entriesRef.current = []
         setEntries([])
@@ -140,9 +143,9 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
 
         if (observerRef.current) observerRef.current.disconnect()
 
-        fetchEntries({ cursor: null, q: debouncedQ, order })
+        fetchEntries({ cursor: null, q: debouncedQ, order, starredOnly })
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [debouncedQ, order])
+    }, [debouncedQ, order, starredOnly])
 
     const lastEntryRef = useCallback(
         (node: HTMLDivElement | null) => {
@@ -157,14 +160,14 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
                     if (!nextCursorRef.current) return
                     if (isFetchingRef.current) return
 
-                    fetchEntries({ cursor: nextCursorRef.current, q: debouncedQ, order })
+                    fetchEntries({ cursor: nextCursorRef.current, q: debouncedQ, order, starredOnly })
                 },
                 { rootMargin: '200px' }
             )
 
             observerRef.current.observe(node)
         },
-        [fetchEntries, debouncedQ, order]
+        [fetchEntries, debouncedQ, order, starredOnly]
     )
 
     return (
@@ -190,6 +193,15 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
                         <ArrowUpIcon className="h-4 w-4" />
                     )}
                 </Button>
+                <Button
+                    onClick={() => setStarredOnly((current) => !current)}
+                    title="Toggle starred entries only"
+                    variant="secondary"
+                    aria-pressed={starredOnly}
+                >
+                    <StarIcon className={`h-4 w-4 ${starredOnly ? 'fill-current' : ''}`} />
+                </Button>
+
                 <Button
                     onClick={() => setViewMode((mode) => (mode === 'cards' ? 'long' : 'cards'))}
                     title="Toggle view mode"

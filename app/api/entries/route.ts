@@ -18,6 +18,7 @@ export async function GET(req: Request) {
     const qRaw = url.searchParams.get("q") ?? "";
     const q = qRaw.trim();
     const order = url.searchParams.get('order') === 'asc' ? 'asc' : 'desc'
+    const starredOnly = url.searchParams.get('starred') === 'true'
 
     let query = supabase
         .from("entries")
@@ -28,6 +29,10 @@ export async function GET(req: Request) {
     if (q.length > 0) {
         // Basic substring match (case-insensitive)
         query = query.or(`title.ilike.%${q}%,body.ilike.%${q}%`);
+    }
+
+    if (starredOnly) {
+        query = query.eq('starred', true);
     }
 
     if (cursor) {
