@@ -32,6 +32,10 @@ export default function EntryList({ initialViewMode }: EntryListProps) {
     const [viewMode, setViewMode] = useState<'cards' | 'long'>(initialViewMode)
     const viewModeCookieName = 'entries-view-mode'
 
+    useEffect(() => {
+        setViewMode(initialViewMode)
+    }, [initialViewMode])
+
     const [q, setQ] = useState('')
     const debouncedQ = useDebouncedValue(q, 250)
 
@@ -50,7 +54,7 @@ export default function EntryList({ initialViewMode }: EntryListProps) {
 
     useEffect(() => {
         document.cookie = `${viewModeCookieName}=${viewMode}; path=/; max-age=2592000; samesite=lax`
-    }, [viewMode, viewModeCookieName])
+    }, [viewMode])
 
     const fetchEntries = useCallback(
         async (opts: { cursor?: string | null; q?: string; order: 'asc' | 'desc' }) => {
