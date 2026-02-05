@@ -33,51 +33,51 @@ function EmbeddingBadge({ status }: { status: string }) {
 }
 
 function EmbedControls({
-                           // entryId,
-                           // body,
+                           entryId,
+                           body,
                            status,
                        }: {
     entryId: string;
     body: string;
     status: Entry["embedding_status"];
 }) {
-    //const [running, setRunning] = useState(false);
+    const [running, setRunning] = useState(false);
 
-    // async function rerunEmbedding() {
-    //     setRunning(true);
-    //
-    //     try {
-    //         const res = await fetch("/api/embed-entry", {
-    //             method: "POST",
-    //             headers: { "Content-Type": "application/json" },
-    //             body: JSON.stringify({ id: entryId, body: body }),
-    //         });
-    //         if (!res.ok) {
-    //             const payload = await res.json().catch(() => null);
-    //             const message = payload?.error ?? "Failed to rerun embedding.";
-    //             throw new Error(message);
-    //         }
-    //     } catch (error) {
-    //         const message =
-    //             error instanceof Error ? error.message : "Failed to rerun embedding.";
-    //         alert(message);
-    //     } finally {
-    //         setRunning(false);
-    //     }
-    // }
+    async function rerunEmbedding() {
+        setRunning(true);
+
+        try {
+            const res = await fetch("/api/embed-entry", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: entryId, body: body }),
+            });
+            if (!res.ok) {
+                const payload = await res.json().catch(() => null);
+                const message = payload?.error ?? "Failed to rerun embedding.";
+                throw new Error(message);
+            }
+        } catch (error) {
+            const message =
+                error instanceof Error ? error.message : "Failed to rerun embedding.";
+            alert(message);
+        } finally {
+            setRunning(false);
+        }
+    }
 
     return (
         <div className="flex items-center gap-2">
             <EmbeddingBadge status={status} />
 
-            {/*<Button*/}
-            {/*    onClick={rerunEmbedding}*/}
-            {/*    variant="ghost"*/}
-            {/*    disabled={running}*/}
-            {/*    className="text-xs"*/}
-            {/*>*/}
-            {/*    {running ? "Embedding…" : "Re-run"}*/}
-            {/*</Button>*/}
+            <Button
+                onClick={rerunEmbedding}
+                variant="ghost"
+                disabled={running}
+                className="text-xs"
+            >
+                {running ? "Embedding…" : "Re-run"}
+            </Button>
 
             {/*<Button*/}
             {/*    variant="ghost"*/}
