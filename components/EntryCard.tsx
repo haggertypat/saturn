@@ -56,7 +56,10 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete,
     )
 
     const isLongForm = viewMode === 'long'
-    const preview = entry.body.slice(0, 200) + (entry.body.length > 200 ? '...' : '')
+    const firstPreviewLine = entry.body.split(/\r?\n/, 1)[0] ?? ''
+    const truncatedPreviewLine = firstPreviewLine.slice(0, 200)
+    const hasMorePreviewContent = entry.body.includes('\n') || firstPreviewLine.length > 200
+    const preview = truncatedPreviewLine + (hasMorePreviewContent ? '...' : '')
     const body = isLongForm ? entry.body : preview
     const cleanBody = stripMarkdownFromPreview(body)
 
