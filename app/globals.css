@@ -69,9 +69,11 @@ input[type="date"] {
     content: "";
 }
 .prose {
+    --tw-prose-hr: var(--color-zinc-300);
     --tw-prose-quote-borders: var(--color-zinc-300);
 }
 
 .dark .prose {
+    --tw-prose-hr: var(--color-zinc-700);
     --tw-prose-quote-borders: var(--color-zinc-700);
 }
