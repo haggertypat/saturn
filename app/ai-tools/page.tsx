@@ -28,9 +28,6 @@ export default async function AiToolsPage() {
             <main className="max-w-4xl mx-auto py-10 px-4 space-y-4">
                 <div>
                     <h1 className="text-2xl font-semibold">Embeddings &amp; AI tools</h1>
-                    <p className="text-sm text-neutral-500">
-                        Placeholder page for embedding and AI workflows.
-                    </p>
                 </div>
                 <AiToolsPanel initialEntries={entries ?? []} />
             </main>

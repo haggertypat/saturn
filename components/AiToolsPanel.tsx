@@ -127,7 +127,7 @@ export default function AiToolsPanel({
                     disabled={embeddingPending}
                     className="text-sm"
                 >
-                    {embeddingPending ? "Embedding pending…" : "Embed pending"}
+                    {embeddingPending ? "Re-running…" : "Re-run failed and pending"}
                 </Button>
             </div>
 
