@@ -13,93 +13,6 @@ import {EntryWithSimilarity} from "@/lib/entries";
 import {PencilIcon, AdjustmentsHorizontalIcon} from '@heroicons/react/24/outline'
 import StarredBadge from '@/components/StarredBadge'
 
-function EmbeddingBadge({ status }: { status: string }) {
-    const map: Record<string, string> = {
-        complete: "bg-neutral-100 text-neutral-800",
-        pending: "bg-neutral-100 text-neutral-800",
-        failed: "bg-neutral-100 text-neutral-800",
-    };
-
-    return (
-        <div>
-            <span className="text-xs px-2 py-1">Embedding status: </span>
-            <span
-                className={`text-xs px-2 py-1 rounded ${map[status] ?? "bg-gray-100"}`}
-            >
-                {status}
-            </span>
-        </div>
-    )
-}
-
-function EmbedControls({
-                           entryId,
-                           body,
-                           status,
-                       }: {
-    entryId: string;
-    body: string;
-    status: Entry["embedding_status"];
-}) {
-    const [running, setRunning] = useState(false);
-
-    async function rerunEmbedding() {
-        setRunning(true);
-
-        try {
-            const res = await fetch("/api/embed-entry", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id: entryId, body: body }),
-            });
-            if (!res.ok) {
-                const payload = await res.json().catch(() => null);
-                const message = payload?.error ?? "Failed to rerun embedding.";
-                throw new Error(message);
-            }
-        } catch (error) {
-            const message =
-                error instanceof Error ? error.message : "Failed to rerun embedding.";
-            alert(message);
-        } finally {
-            setRunning(false);
-        }
-    }
-
-    return (
-        <div className="flex items-center gap-2">
-            <EmbeddingBadge status={status} />
-
-            <Button
-                onClick={rerunEmbedding}
-                variant="ghost"
-                disabled={running}
-                className="text-xs"
-            >
-                {running ? "Embedding…" : "Re-run"}
-            </Button>
-
-            {/*<Button*/}
-            {/*    variant="ghost"*/}
-            {/*    className="text-xs"*/}
-            {/*    onClick={() => {*/}
-            {/*        const secret = process.env.NEXT_PUBLIC_EMBED_CRON_SECRET;*/}
-            {/*        if (!secret) {*/}
-            {/*            alert("Missing NEXT_PUBLIC_EMBED_CRON_SECRET.");*/}
-            {/*            return;*/}
-            {/*        }*/}
-            {/*        fetch("/api/embed-pending", {*/}
-            {/*            method: "POST",*/}
-            {/*            headers: { "x-cron-secret": secret },*/}
-            {/*        });*/}
-            {/*    }}*/}
-            {/*>*/}
-            {/*    Embed all pending*/}
-            {/*</Button>*/}
-        </div>
-    );
-}
-
 export function RelatedEntries({ entryId }: { entryId: string }) {
     const [matches, setMatches] = useState<EntryWithSimilarity[]>([]);
     const [loading, setLoading] = useState(true);
@@ -264,9 +177,6 @@ export default function EntryView({ entry }: { entry: Entry }) {
             </div>
 
             <div className="flex items-center justify-end mt-6 gap-4 pt-6 border-t border-gray-200">
-                { settingsVisible && (
-                    <EmbedControls entryId={currentEntry.id} body={currentEntry.body} status={currentEntry.embedding_status}></EmbedControls>
-                )}
                 { settingsVisible && (
                     <Button
                         href={`/entries/${entry.id}/edit`}
