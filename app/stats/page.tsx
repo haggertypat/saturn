@@ -129,21 +129,21 @@ export default async function StatsPage() {
           </div>
         </section>
 
-        <section className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-4">
-          <h3 className="text-lg mb-3">Top tags</h3>
-          {topTags.length === 0 ? (
-            <p className="text-neutral-600 dark:text-neutral-400">No tags yet.</p>
-          ) : (
-            <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {topTags.map((item) => (
-                <li key={item.tag} className="flex justify-between gap-2">
-                  <span>#{item.tag}</span>
-                  <span className="tabular-nums">{item.count}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+        {/*<section className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-4">*/}
+        {/*  <h3 className="text-lg mb-3">Top tags</h3>*/}
+        {/*  {topTags.length === 0 ? (*/}
+        {/*    <p className="text-neutral-600 dark:text-neutral-400">No tags yet.</p>*/}
+        {/*  ) : (*/}
+        {/*    <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">*/}
+        {/*      {topTags.map((item) => (*/}
+        {/*        <li key={item.tag} className="flex justify-between gap-2">*/}
+        {/*          <span>#{item.tag}</span>*/}
+        {/*          <span className="tabular-nums">{item.count}</span>*/}
+        {/*        </li>*/}
+        {/*      ))}*/}
+        {/*    </ul>*/}
+        {/*  )}*/}
+        {/*</section>*/}
       </main>
     </div>
   )
