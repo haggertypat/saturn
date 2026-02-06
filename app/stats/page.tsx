@@ -57,19 +57,19 @@ export default async function StatsPage() {
     .map(([category, count]) => ({ category, count }))
     .sort((a, b) => b.count - a.count)
 
-  const tagsFrequency = entries.reduce<Record<string, number>>((acc, entry) => {
-    for (const tag of entry.tags ?? []) {
-      const normalizedTag = tag.trim().toLowerCase()
-      if (!normalizedTag) continue
-      acc[normalizedTag] = (acc[normalizedTag] ?? 0) + 1
-    }
-    return acc
-  }, {})
+  // const tagsFrequency = entries.reduce<Record<string, number>>((acc, entry) => {
+  //   for (const tag of entry.tags ?? []) {
+  //     const normalizedTag = tag.trim().toLowerCase()
+  //     if (!normalizedTag) continue
+  //     acc[normalizedTag] = (acc[normalizedTag] ?? 0) + 1
+  //   }
+  //   return acc
+  // }, {})
 
-  const topTags = Object.entries(tagsFrequency)
-    .map(([tag, count]) => ({ tag, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 8)
+  // const topTags = Object.entries(tagsFrequency)
+  //   .map(([tag, count]) => ({ tag, count }))
+  //   .sort((a, b) => b.count - a.count)
+  //   .slice(0, 8)
 
   const currentYear = new Date().getUTCFullYear().toString()
   const entriesThisYear = entriesPerYear[currentYear] ?? 0
