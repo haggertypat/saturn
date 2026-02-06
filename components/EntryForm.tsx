@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Entry } from '@/lib/types'
 import { Button } from '@/components/Button'
 import ZenEditor from './ZenEditor'
-import {ArrowsPointingOutIcon} from "@heroicons/react/24/outline";
+import { ArrowsPointingOutIcon, ChevronDownIcon } from "@heroicons/react/24/outline"
 
 type DraftPayload = {
     title: string
@@ -295,24 +295,30 @@ export default function EntryForm({ entry }: { entry?: Entry }) {
                     <label className="sr-only" htmlFor="category">
                         Category
                     </label>
-                    <select
-                        id="category"
-                        value={category ?? ''}
-                        onChange={(e) =>
-                            setCategory(
-                                (e.target.value || null) as Entry['category']
-                            )
-                        }
-                        className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-neutral-500 focus:border-transparent"
-                    >
-                        <option value="">Uncategorized</option>
-                        <option value="dream">Dream</option>
-                        <option value="journal">Journal</option>
-                        <option value="outing">Outing</option>
-                        <option value="essay">Essay</option>
-                        <option value="note">Note</option>
-                        <option value="other">Other</option>
-                    </select>
+                    <div className="relative">
+                        <select
+                            id="category"
+                            value={category ?? ''}
+                            onChange={(e) =>
+                                setCategory(
+                                    (e.target.value || null) as Entry['category']
+                                )
+                            }
+                            className="appearance-none rounded-md border border-gray-300 pl-3 pr-11 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-neutral-500 focus:border-transparent"
+                        >
+                            <option value="">Uncategorized</option>
+                            <option value="dream">Dream</option>
+                            <option value="journal">Journal</option>
+                            <option value="outing">Outing</option>
+                            <option value="essay">Essay</option>
+                            <option value="note">Note</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <ChevronDownIcon
+                            className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500"
+                            aria-hidden="true"
+                        />
+                    </div>
                 </div>
                 <div>
                     <Button type="button" variant="ghost" onClick={() => setIsZenMode(true)}>
