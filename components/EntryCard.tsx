@@ -2,11 +2,34 @@
 
 import Link from 'next/link'
 import type { Entry } from '@/lib/types'
-import ReactMarkdown from 'react-markdown'
 import { forwardRef, useState } from 'react';
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import StarredBadge from '@/components/StarredBadge'
+
+function stripMarkdownFromPreview(text: string): string {
+    const lines = text.split('\n')
+    const cleanedLines: string[] = []
+
+    for (const line of lines) {
+        const isHorizontalRule = /^\s{0,3}-{3,}\s*$/.test(line)
+
+        if (isHorizontalRule) {
+            if (cleanedLines.at(-1)?.trim() === '') {
+                cleanedLines.pop()
+            }
+            continue
+        }
+
+        cleanedLines.push(
+            line
+                .replace(/^\s{0,3}#{2,}\s*/g, '')
+                .replace(/^\s{0,3}>\s?/g, '')
+        )
+    }
+
+    return cleanedLines.join('\n')
+}
 
 interface EntryCardProps {
     entry: Entry;
@@ -33,8 +56,12 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete,
     )
 
     const isLongForm = viewMode === 'long'
-    const preview = entry.body.slice(0, 200) + (entry.body.length > 200 ? '...' : '')
+    const firstPreviewLine = entry.body.split(/\r?\n/, 1)[0] ?? ''
+    const truncatedPreviewLine = firstPreviewLine.slice(0, 200)
+    const hasMorePreviewContent = entry.body.includes('\n') || firstPreviewLine.length > 200
+    const preview = truncatedPreviewLine + (hasMorePreviewContent ? '...' : '')
     const body = isLongForm ? entry.body : preview
+    const cleanBody = stripMarkdownFromPreview(body)
 
     return (
         <div ref={ref}> {/* observer attached here */}
@@ -129,8 +156,8 @@ const EntryCard = forwardRef<HTMLDivElement, EntryCardProps>(({ entry, onDelete,
                             </div>
                         </div>
 
-                        <div className="prose prose-sm dark:prose-invert max-w-none">
-                            <ReactMarkdown>{body}</ReactMarkdown>
+                        <div className="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-line">
+                            {cleanBody}
                         </div>
                     </article>
                 </Link>
