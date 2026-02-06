@@ -8,15 +8,27 @@ import { createClient } from '@/lib/supabase/client'
 import StarredBadge from '@/components/StarredBadge'
 
 function stripMarkdownFromPreview(text: string): string {
-    return text
-        .split('\n')
-        .map((line) =>
+    const lines = text.split('\n')
+    const cleanedLines: string[] = []
+
+    for (const line of lines) {
+        const isHorizontalRule = /^\s{0,3}-{3,}\s*$/.test(line)
+
+        if (isHorizontalRule) {
+            if (cleanedLines.at(-1)?.trim() === '') {
+                cleanedLines.pop()
+            }
+            continue
+        }
+
+        cleanedLines.push(
             line
                 .replace(/^\s{0,3}#{2,}\s*/g, '')
                 .replace(/^\s{0,3}>\s?/g, '')
-                .replace(/^\s{0,3}-{3,}\s*$/g, '')
         )
-        .join('\n')
+    }
+
+    return cleanedLines.join('\n')
 }
 
 interface EntryCardProps {
