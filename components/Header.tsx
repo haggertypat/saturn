@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ThemeToggle } from './ThemeToggle'
-import { PlusCircleIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/outline'
+import { PlusCircleIcon, ArrowRightStartOnRectangleIcon, ChartBarIcon } from '@heroicons/react/24/outline'
 import {Button} from "@/components/Button";
 
 
@@ -32,6 +32,14 @@ export default function Header() {
                         className="inline-flex items-center gap-1"
                     >
                         <PlusCircleIcon className="h-5 w-5" />
+                    </Button>
+
+                    <Button
+                        href="/stats"
+                        variant="ghost"
+                        className="inline-flex items-center gap-1"
+                    >
+                        <ChartBarIcon className="h-5 w-5" />
                     </Button>
 
                     <ThemeToggle />
