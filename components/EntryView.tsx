@@ -200,18 +200,6 @@ export default function EntryView({ entry }: { entry: Entry }) {
                 </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-neutral-600 dark:text-neutral-300">
-                <span>Embedding status: {currentEntry.embedding_status}</span>
-                <Button
-                    variant="ghost"
-                    className="text-xs"
-                    disabled={rerunningEmbedding}
-                    onClick={rerunEmbedding}
-                >
-                    {rerunningEmbedding ? "Embedding…" : "Re-run embedding"}
-                </Button>
-            </div>
-
             <div className="prose dark:prose-invert max-w-none mt-6">
 
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -220,6 +208,19 @@ export default function EntryView({ entry }: { entry: Entry }) {
             </div>
 
             <div className="flex items-center justify-end mt-6 gap-4 pt-6 border-t border-gray-200">
+                { settingsVisible && (
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-neutral-600 dark:text-neutral-300">
+                        <span>Embedding: {currentEntry.embedding_status}</span>
+                        <Button
+                            variant="ghost"
+                            className="text-xs"
+                            disabled={rerunningEmbedding}
+                            onClick={rerunEmbedding}
+                        >
+                            {rerunningEmbedding ? "Embedding…" : "Re-run"}
+                        </Button>
+                    </div>
+                )}
                 { settingsVisible && (
                     <Button
                         href={`/entries/${entry.id}/edit`}
