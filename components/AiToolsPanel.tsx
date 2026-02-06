@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Button } from "@/components/Button";
+import Link from "next/link";
 
 type EntryEmbeddingItem = {
     id: string;
@@ -138,7 +139,12 @@ export default function AiToolsPanel({
                         className="p-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
                     >
                         <div className="text-sm min-w-0">
-                            <span className="font-medium">{entry.title ?? "Untitled"}</span>
+                            <Link
+                                href={`/entries/${entry.id}`}
+                                className="font-medium hover:underline"
+                            >
+                                {entry.title ?? "Untitled"}
+                            </Link>
                             <span className="text-neutral-500"> · {entry.event_date}</span>
                             <span className="text-neutral-500"> · {entry.embedding_status}</span>
                         </div>

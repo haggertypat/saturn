@@ -64,6 +64,7 @@ export default function EntryView({ entry }: { entry: Entry }) {
     const supabase = createClient()
     const [deleting, setDeleting] = useState(false)
     const [settingsVisible, setSettingsVisible] = useState(false);
+    const [rerunningEmbedding, setRerunningEmbedding] = useState(false);
 
     const parts = entry.event_date.split('-')
 
@@ -112,6 +113,36 @@ export default function EntryView({ entry }: { entry: Entry }) {
     }, [currentEntry.id, currentEntry.embedding_status]);
 
 
+
+
+    const refreshEntryStatus = async () => {
+        const res = await fetch(`/api/entries/${currentEntry.id}`);
+        if (!res.ok) return;
+        const updated = await res.json();
+        setCurrentEntry(updated);
+    };
+
+    const rerunEmbedding = async () => {
+        setRerunningEmbedding(true);
+        try {
+            const res = await fetch("/api/embed-entry", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: currentEntry.id, body: currentEntry.body }),
+            });
+
+            if (!res.ok) {
+                const payload = await res.json().catch(() => null);
+                throw new Error(payload?.error ?? "Failed to rerun embedding.");
+            }
+
+            await refreshEntryStatus();
+        } catch (error) {
+            alert(error instanceof Error ? error.message : "Failed to rerun embedding.");
+        } finally {
+            setRerunningEmbedding(false);
+        }
+    };
     const handleDelete = async () => {
         if (!confirm('Are you sure you want to delete this entry?')) {
             return
@@ -167,6 +198,18 @@ export default function EntryView({ entry }: { entry: Entry }) {
                         })}
                     </time>
                 </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-neutral-600 dark:text-neutral-300">
+                <span>Embedding status: {currentEntry.embedding_status}</span>
+                <Button
+                    variant="ghost"
+                    className="text-xs"
+                    disabled={rerunningEmbedding}
+                    onClick={rerunEmbedding}
+                >
+                    {rerunningEmbedding ? "Embedding…" : "Re-run embedding"}
+                </Button>
             </div>
 
             <div className="prose dark:prose-invert max-w-none mt-6">
