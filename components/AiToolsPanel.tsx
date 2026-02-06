@@ -70,17 +70,10 @@ export default function AiToolsPanel({
     }
 
     async function runPendingEmbeddings() {
-        const secret = process.env.NEXT_PUBLIC_EMBED_CRON_SECRET;
-        if (!secret) {
-            alert("Missing NEXT_PUBLIC_EMBED_CRON_SECRET.");
-            return;
-        }
-
         setEmbeddingPending(true);
         try {
             const res = await fetch("/api/embed-pending", {
                 method: "POST",
-                headers: { "x-cron-secret": secret },
             });
 
             if (!res.ok) {

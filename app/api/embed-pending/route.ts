@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import { tryEmbedEntry } from "@/app/actions/entries";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,13 +11,24 @@ const supabase = createClient(
 );
 
 export async function POST() {
-    const expectedSecret = process.env.NEXT_PUBLIC_EMBED_CRON_SECRET;
-    if (!expectedSecret) {
-        return NextResponse.json({ error: "Missing cron secret" }, { status: 500 });
+    const expectedSecret = process.env.EMBED_CRON_SECRET;
+    const providedSecret = (await headers()).get("x-cron-secret");
+
+    // Allow authenticated in-app use (single user dashboard button),
+    // or headless cron callers that provide the shared secret.
+    let isAuthenticatedUser = false;
+    try {
+        const supabaseAuth = await createServerSupabaseClient();
+        const {
+            data: { user },
+        } = await supabaseAuth.auth.getUser();
+        isAuthenticatedUser = !!user;
+    } catch {
+        isAuthenticatedUser = false;
     }
 
-    const providedSecret = (await headers()).get("x-cron-secret");
-    if (providedSecret !== expectedSecret) {
+    const hasValidSecret = !!expectedSecret && providedSecret === expectedSecret;
+    if (!isAuthenticatedUser && !hasValidSecret) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
