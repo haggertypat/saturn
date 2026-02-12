@@ -10,7 +10,7 @@ import {Button} from "@/components/Button";
 import { fetchTopMatches } from "@/lib/entries";
 import EntryCard from "@/components/EntryCard";
 import {EntryWithSimilarity} from "@/lib/entries";
-import {PencilIcon, AdjustmentsHorizontalIcon} from '@heroicons/react/24/outline'
+import {PencilIcon, AdjustmentsHorizontalIcon, ArrowDownTrayIcon} from '@heroicons/react/24/outline'
 import StarredBadge from '@/components/StarredBadge'
 
 export function RelatedEntries({ entryId }: { entryId: string }) {
@@ -143,6 +143,31 @@ export default function EntryView({ entry }: { entry: Entry }) {
             setRerunningEmbedding(false);
         }
     };
+    const downloadAsMarkdown = () => {
+        const dateFormatted = eventDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        })
+        const lines = [
+            `# ${entry.title ?? 'Untitled'}`,
+            `## ${dateFormatted}`,
+            '',
+            `## ${entry.category ?? 'Uncategorized'}`,
+            '',
+            entry.body,
+        ]
+        const markdown = lines.join('\n')
+        const blob = new Blob([markdown], { type: 'text/markdown' })
+        const url = URL.createObjectURL(blob)
+        const filename = `${(entry.title ?? 'entry').replace(/[^a-z0-9-_]/gi, '-').replace(/-+/g, '-')}-${entry.event_date}.md`
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        a.click()
+        URL.revokeObjectURL(url)
+    }
+
     const handleDelete = async () => {
         if (!confirm('Are you sure you want to delete this entry?')) {
             return
@@ -180,6 +205,14 @@ export default function EntryView({ entry }: { entry: Entry }) {
                             )}
                         </div>
                         <div className="flex items-center gap-2 text-sm">
+
+                            <Button
+                                onClick={downloadAsMarkdown}
+                                variant="secondary"
+                                className="inline-flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                                <ArrowDownTrayIcon className="h-4 w-4" /> Download
+                            </Button>
                             <Button
                                 href={`/entries/${entry.id}/edit`}
                                 variant="secondary"
