@@ -90,6 +90,7 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
 
     const savedScrollRef = useRef<number | null>(null)
     const restoredScrollRef = useRef(false)
+    const isUserScrollRef = useRef(false)
 
     const isFetchingRef = useRef(false)
     const hasMoreRef = useRef(true)
@@ -125,16 +126,35 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
             savedScrollRef.current = persisted.scrollY
         }
 
+        let userScrollResetTimeout: ReturnType<typeof setTimeout> | null = null
+
+        const markUserScroll = () => {
+            isUserScrollRef.current = true
+            if (userScrollResetTimeout) {
+                clearTimeout(userScrollResetTimeout)
+            }
+            // If we don't see another explicit user scroll signal for a short
+            // window, assume subsequent scroll events are programmatic (e.g.
+            // Next/router forcing scroll to top during navigation).
+            userScrollResetTimeout = setTimeout(() => {
+                isUserScrollRef.current = false
+            }, 250)
+        }
+
         const handleScroll = () => {
             const y = window.scrollY
             const current = readPersistedListState()
 
             // When navigating away to an entry page (or back to the list),
-            // the browser often scrolls to 0, which would overwrite our
-            // previously saved deep scroll position. If we already have a
-            // non-zero saved scrollY, ignore these "jump to top" events
-            // to preserve the last meaningful position.
-            if (y === 0 && current?.scrollY && current.scrollY > 0) {
+            // the browser/Next.js router often scrolls to 0 programmatically,
+            // which would overwrite our previously saved deep scroll
+            // position. If we already have a non-zero saved scrollY and this
+            // does NOT look like a user-initiated scroll, ignore the jump.
+            //
+            // However, if the user *manually* scrolls back to the top (e.g.
+            // via wheel/touch/keyboard), we *do* want to persist scrollY: 0
+            // so that returning to the list keeps them at the top.
+            if (y === 0 && !isUserScrollRef.current && current?.scrollY && current.scrollY > 0) {
                 return
             }
 
@@ -142,9 +162,18 @@ export default function EntryList({ initialViewMode, initialOrder }: EntryListPr
         }
 
         window.addEventListener('scroll', handleScroll)
+        window.addEventListener('wheel', markUserScroll, { passive: true })
+        window.addEventListener('touchmove', markUserScroll, { passive: true })
+        window.addEventListener('keydown', markUserScroll)
 
         return () => {
             window.removeEventListener('scroll', handleScroll)
+            window.removeEventListener('wheel', markUserScroll)
+            window.removeEventListener('touchmove', markUserScroll)
+            window.removeEventListener('keydown', markUserScroll)
+            if (userScrollResetTimeout) {
+                clearTimeout(userScrollResetTimeout)
+            }
         }
     }, [])
 
