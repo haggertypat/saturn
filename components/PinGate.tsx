@@ -122,21 +122,21 @@ export default function PinGate({ children }: PinGateProps) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-sm rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl">
+    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex items-center justify-center px-4">
+      <div className="w-full max-w-sm rounded-2xl border border-neutral-800 bg-neutral-900/80 p-6 shadow-xl">
         <h1 className="text-xl font-semibold">Enter PIN to continue</h1>
-        <p className="mt-2 text-sm text-slate-400">
+        <p className="mt-2 text-sm text-neutral-400">
           This unlock lasts 30 minutes and resets when the tab is closed.
         </p>
         <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="text-sm text-slate-300" htmlFor="pin">
+            <label className="text-sm text-neutral-300" htmlFor="pin">
               PIN
             </label>
             <input
               id="pin"
               inputMode="numeric"
-              className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-lg tracking-[0.3em] text-slate-100 outline-none ring-0 focus:border-slate-500"
+              className="mt-2 w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-lg tracking-[0.3em] text-neutral-100 outline-none ring-0 focus:border-neutral-500"
               maxLength={4}
               autoFocus
               value={pin}
@@ -154,7 +154,7 @@ export default function PinGate({ children }: PinGateProps) {
             ) : null}
           </div>
           <button
-            className="w-full rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-600"
+            className="w-full rounded-lg bg-neutral-700 px-4 py-2 text-sm font-semibold text-white hover:bg-neutral-600"
             type="submit"
           >
             Unlock
